@@ -1,0 +1,38 @@
+﻿using AdControl.Application.Repository.Abstractions;
+using AdControl.Application.Services.Abstractions;
+using AdControl.Domain.Models;
+
+namespace AdControl.Application.Services.Implementations;
+
+public class ConfigService : IConfigService
+{
+    private readonly IConfigRepository _repo;
+
+    public ConfigService(IConfigRepository repo)
+    {
+        _repo = repo;
+    }
+
+    public async Task<Config> CreateAsync(Guid? userId, IEnumerable<ConfigItem> items, CancellationToken ct = default)
+    {
+        var cfg = new Config { Id = Guid.NewGuid(), UserId = userId, CreatedAt = DateTime.UtcNow };
+        cfg.Items = items.Select(i =>
+        {
+            i.Id = i.Id == Guid.Empty ? Guid.NewGuid() : i.Id;
+            i.ConfigId = cfg.Id;
+            return i;
+        }).ToList();
+
+        return await _repo.CreateAsync(cfg, ct);
+    }
+
+    public async Task<Config?> GetAsync(Guid id, CancellationToken ct = default)
+    {
+        return await _repo.GetAsync(id, ct);
+    }
+
+    public async Task AssignToScreenAsync(Guid screenId, Guid configId, bool isActive, CancellationToken ct = default)
+    {
+        await _repo.AssignToScreenAsync(screenId, configId, isActive, ct);
+    }
+}

@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AdControl.Domain", "AdContr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AdControl.Application", "AdControl.Application\AdControl.Application.csproj", "{DFA55362-C12D-88E0-11D9-5D07B3342A3B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AdControl.Protos", "..\AdControl.Protos\AdControl.Protos.csproj", "{2AA19A09-9BDF-BD1E-6239-CB18C553B404}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{DFA55362-C12D-88E0-11D9-5D07B3342A3B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DFA55362-C12D-88E0-11D9-5D07B3342A3B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DFA55362-C12D-88E0-11D9-5D07B3342A3B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2AA19A09-9BDF-BD1E-6239-CB18C553B404}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2AA19A09-9BDF-BD1E-6239-CB18C553B404}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2AA19A09-9BDF-BD1E-6239-CB18C553B404}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2AA19A09-9BDF-BD1E-6239-CB18C553B404}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
