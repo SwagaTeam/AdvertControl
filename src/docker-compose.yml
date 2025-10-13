@@ -1,0 +1,109 @@
+services:
+  postgres:
+    container_name: postgres
+    image: postgres:15
+    environment:
+      POSTGRES_DB: adcontrol
+      POSTGRES_USER: aduser
+      POSTGRES_PASSWORD: secret
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL","pg_isready -U aduser -d adcontrol"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    container_name: redis
+    image: redis:7
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ["CMD","redis-cli","ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  minio:
+    container_name: minio
+    image: minio/minio:latest
+    environment:
+      MINIO_ROOT_USER: minioaccess
+      MINIO_ROOT_PASSWORD: miniosecret
+    command: server /data --console-address ":9001"
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - miniodata:/data
+
+  adcontrol-web:
+    container_name: adcontrol-web
+    build:
+      context: .
+      dockerfile: ./Server/AdControl.Web/AdControl.Web/Dockerfile
+      target: dev
+    healthcheck:
+      disable: true
+    environment:
+      - ConnectionStrings__DefaultConnection=Host=postgres;Database=adcontrol;Username=aduser;Password=secret
+      - ASPNETCORE_URLS=https://+:5001
+      - ASPNETCORE_ENVIRONMENT=Development 
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/adcontrol.pfx
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=password
+    ports:
+      - "5001:5001"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ~/.aspnet/https:/https:ro
+
+  # adcontrol-avalonia-logic:
+  #   container_name: adcontrol-avalonia-logic
+  #   build:
+  #     context: .
+  #     dockerfile: Server/AdControl.Avalonia.Logic/AdControl.Avalonia.Logic/Dockerfile
+  #   environment:
+  #     - Redis__Url=redis:6379
+  #     - ASPNETCORE_URLS=http://+:5002
+  #   ports:
+  #     - "5002:5002"
+  #   depends_on:
+  #     redis:
+  #       condition: service_healthy
+
+  adcontrol-gateway:
+    container_name: adcontrol-gateway
+    build:
+      context: .
+      dockerfile: Server/AdControl.Gateway/AdControl.Gateway/Dockerfile
+    environment:
+      - Grpc__ScreenService=https://adcontrol-web:5001
+      - Grpc__AvaloniaLogicService=http://adcontrol-avalonia-logic:5002
+      - Redis__Url=redis:6379
+      - Minio__Endpoint=minio:9000
+      - Minio__AccessKey=minioaccess
+      - Minio__SecretKey=miniosecret
+      - ASPNETCORE_URLS=http://+:5000
+      - ASPNETCORE_ENVIRONMENT=Development 
+      - ASPNETCORE_PORT=5000 
+    ports:
+      - "5000:5000"
+    depends_on:
+      # adcontrol-web:
+      #   condition: service_healthy
+      # adcontrol-avalonia-logic:
+      #   condition: service_healthy
+      redis:
+        condition: service_healthy
+      minio:
+        condition: service_started
+
+volumes:
+  pgdata:
+  redisdata:
+  miniodata:

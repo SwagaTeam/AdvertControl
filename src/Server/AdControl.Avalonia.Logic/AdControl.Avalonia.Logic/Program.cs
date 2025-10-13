@@ -1,5 +1,5 @@
 
-namespace AdControl.API
+namespace AdControl.Avalonia.Logic
 {
     public class Program
     {

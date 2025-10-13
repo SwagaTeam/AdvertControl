@@ -1,0 +1,44 @@
+# services:
+#   adcontrol-web:
+#     container_name: adcontrol-web
+#     build:
+#       context: .
+#       dockerfile: ./Server/AdControl.Web/AdControl.Web/Dockerfile
+#       target: dev
+#     volumes:
+#       - ./Server/AdControl.Web/AdControl.Web:/src/Server/AdControl.Web/AdControl.Web:delegated
+#       - ./Server/AdControl.Application:/src/Server/AdControl.Application:delegated
+#       - ./Server/AdControl.Domain:/src/Server/AdControl.Domain:delegated
+#       - ./Server/AdControl.Core:/src/Server/AdControl.Core:delegated
+#       - ./Server/AdControl.Protos:/src/Server/AdControl.Protos:delegated
+#       - ~/.nuget/packages:/root/.nuget/packages:ro
+#     ports:
+#       - "5001:5001"
+
+#   # adcontrol-avalonia-logic:
+#   #   container_name: adcontrol-avalonia-logic
+#   #   build:
+#   #     context: .
+#   #     dockerfile: Server/AdControl.Avalonia.Logic/Dockerfile
+#   #     target: dev
+#   #   volumes:
+#   #     - ./Server/AdControl.Avalonia.Logic:/src/Server/AdControl.Avalonia.Logic:delegated
+#   #     - ./Server/AdControl.Core:/src/Server/AdControl.Core:delegated
+#   #     - ./Server/AdControl.Protos:/src/Server/AdControl.Protos:delegated
+#   #     - ~/.nuget/packages:/root/.nuget/packages:ro
+#   #   ports:
+#   #     - "5002:5002"
+
+#   adcontrol-gateway:
+#     container_name: adcontrol-gateway
+#     build:
+#       context: .
+#       dockerfile: ./Server/AdControl.Gateway/AdControl.Gateway/Dockerfile
+#       target: dev
+#     volumes:
+#       - ./Server/AdControl.Gateway/AdControl.Gateway:/src/Server/AdControl.Gateway/AdControl.Gateway:delegated
+#       - ./Server/AdControl.Gateway/AdControl.Gateway.Application:/src/Server/AdControl.Gateway/AdControl.Gateway.Application:delegated
+#       - ./Server/AdControl.Protos:/src/Server/AdControl.Protos:delegated
+#       - ~/.nuget/packages:/root/.nuget/packages:ro
+#     ports:
+#       - "5000:80"
