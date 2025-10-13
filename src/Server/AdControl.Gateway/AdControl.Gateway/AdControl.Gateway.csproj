@@ -7,9 +7,11 @@
     <UserSecretsId>f5fa2b46-7826-4502-b41f-273d4cc4c28b</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <DockerComposeProjectPath>..\docker-compose.dcproj</DockerComposeProjectPath>
+    <DockerfileContext>..\..\..</DockerfileContext>
   </PropertyGroup>
 
 	<ItemGroup>
+		<PackageReference Include="Grpc.Net.Client.Web" Version="2.71.0" />
 		<PackageReference Include="Grpc.Net.ClientFactory" Version="2.71.0" />
 		<PackageReference Include="Google.Protobuf" Version="3.32.1" />
 		<PackageReference Include="Minio" Version="6.0.5" />

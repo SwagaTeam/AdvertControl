@@ -1,4 +1,4 @@
-using AdControl.Application.Repository.Abstractions;
+ï»¿using AdControl.Application.Repository.Abstractions;
 using AdControl.Application.Services.Abstractions;
 using AdControl.Application.Services.Implementations;
 using AdControl.Core.Infrastructure.Repository.Implementations;
@@ -9,11 +9,20 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Kestrel: ñëóøàåì íóæíûé ïîðò è ðàçðåøàåì HTTP/2
+AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
+
+// Kestrel: ÑÐ»ÑƒÑˆÐ°ÐµÐ¼ Ð½ÑƒÐ¶Ð½Ñ‹Ð¹ Ð¿Ð¾Ñ€Ñ‚ Ð¸ Ñ€Ð°Ð·Ñ€ÐµÑˆÐ°ÐµÐ¼ HTTP/2
 builder.WebHost.ConfigureKestrel(options =>
 {
     var port = int.TryParse(Environment.GetEnvironmentVariable("ASPNETCORE_PORT"), out var p) ? p : 5001;
-    options.ListenAnyIP(port, listenOptions => { listenOptions.Protocols = HttpProtocols.Http1AndHttp2; });
+    var certPath = Environment.GetEnvironmentVariable("ASPNETCORE_Kestrel__Certificates__Default__Path");
+    var certPassword = Environment.GetEnvironmentVariable("ASPNETCORE_Kestrel__Certificates__Default__Password");
+
+    options.ListenAnyIP(port, listenOptions =>
+    {
+        listenOptions.UseHttps(certPath, certPassword);
+        listenOptions.Protocols = HttpProtocols.Http2;
+    });
 });
 
 // configuration

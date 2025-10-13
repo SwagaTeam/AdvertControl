@@ -1,7 +1,15 @@
 using AdControl.Gateway.Application.Minio;
+using AdControl.Protos;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+using Minio;
+using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
+
+AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
 
 // Kestrel: слушаем нужный порт и разрешаем HTTP/2
 builder.WebHost.ConfigureKestrel(options =>
@@ -55,12 +63,14 @@ if (!string.IsNullOrEmpty(keycloakAuthority))
 }
 
 // gRPC clients
-builder.Services.AddGrpcClient<ScreenService.ScreenServiceClient>(o =>
+builder.Services
+    .AddGrpcClient<ScreenService.ScreenServiceClient>(o =>
         o.Address = new Uri(builder.Configuration["Grpc:ScreenService"] ?? "http://localhost:5001"))
     .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
     {
         ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
     });
+
 
 builder.Services.AddGrpcClient<AvaloniaLogicService.AvaloniaLogicServiceClient>(o =>
         o.Address = new Uri(builder.Configuration["Grpc:AvaloniaLogicService"] ?? "http://localhost:5002"))
