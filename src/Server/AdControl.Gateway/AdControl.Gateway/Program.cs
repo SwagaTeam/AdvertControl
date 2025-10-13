@@ -1,12 +1,14 @@
 using AdControl.Gateway.Application.Minio;
-using AdControl.Protos;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
-using Minio;
-using StackExchange.Redis;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Kestrel: слушаем нужный порт и разрешаем HTTP/2
+builder.WebHost.ConfigureKestrel(options =>
+{
+    var port = int.TryParse(Environment.GetEnvironmentVariable("ASPNETCORE_PORT"), out var p) ? p : 5000;
+    options.ListenAnyIP(port, listenOptions => { listenOptions.Protocols = HttpProtocols.Http1AndHttp2; });
+});
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();

@@ -9,7 +9,7 @@ namespace AdControl.Gateway.Controllers;
 
 [ApiController]
 [Route("api/screen")]
-public partial class ScreenController : ControllerBase
+public class ScreenController : ControllerBase
 {
     private readonly IConnectionMultiplexer _redis;
     private readonly ScreenService.ScreenServiceClient _screenClient;
@@ -44,7 +44,7 @@ public partial class ScreenController : ControllerBase
 
     // GET api/screen/{id}
     [HttpGet("{id}")]
-    [Authorize]
+    //[Authorize]
     public async Task<IActionResult> GetById(string id)
     {
         var req = new GetScreenRequest { Id = id };
@@ -85,12 +85,7 @@ public partial class ScreenController : ControllerBase
             metadata.Add("Authorization", auth.ToString());
         return metadata;
     }
-}
 
-//Pairing
-[Route("api/screen")]
-public partial class ScreenController
-{
     // POST api/screen/pair/confirm
     // От веба (Authenticated). Подтверждает код, создаёт Screen в ScreenService и связывает.
     [HttpPost("pair/confirm")]

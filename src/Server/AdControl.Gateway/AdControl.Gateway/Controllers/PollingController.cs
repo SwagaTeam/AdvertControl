@@ -12,7 +12,7 @@ using StackExchange.Redis;
 namespace AdControl.Gateway.Controllers;
 
 [ApiController]
-[Route("polling")]
+[Route("api/polling")]
 public class PollingController : ControllerBase
 {
     private readonly AvaloniaLogicService.AvaloniaLogicServiceClient _avaloniaClient;

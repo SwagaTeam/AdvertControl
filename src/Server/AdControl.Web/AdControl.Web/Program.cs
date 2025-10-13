@@ -4,9 +4,17 @@ using AdControl.Application.Services.Implementations;
 using AdControl.Core.Infrastructure.Repository.Implementations;
 using AdControl.Core.Persistence;
 using AdControl.Web.Services;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Kestrel: слушаем нужный порт и разрешаем HTTP/2
+builder.WebHost.ConfigureKestrel(options =>
+{
+    var port = int.TryParse(Environment.GetEnvironmentVariable("ASPNETCORE_PORT"), out var p) ? p : 5001;
+    options.ListenAnyIP(port, listenOptions => { listenOptions.Protocols = HttpProtocols.Http1AndHttp2; });
+});
 
 // configuration
 var conn = builder.Configuration.GetConnectionString("DefaultConnection")
