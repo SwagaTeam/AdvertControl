@@ -1,11 +1,7 @@
-using System.Text.Json;
 using AdControl.Auth;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.JSInterop.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
@@ -31,12 +27,11 @@ builder.Services.AddAuthentication(options =>
     .AddCookie()
     .AddOpenIdConnect(options =>
     {
-        options.Authority = "http://localhost:8080/realms/myrealm";
-        options.ClientId = "myclient";
-        options.ClientSecret = "secret"; 
+        options.Authority = "http://keycloak:8080/realms/myrealm";
+        options.ClientId = "admin-cli";
+        options.ClientSecret = "secret";
         options.ResponseType = "code";
         options.SaveTokens = true;
-
         options.Scope.Add("openid");
         options.Scope.Add("profile");
         options.Scope.Add("email");
@@ -50,8 +45,10 @@ builder.Services.AddAuthorization();
 builder.Services.AddOpenApi();
 builder.Services.Configure<KeycloakOptions>(opt =>
 {
-    opt.AdminUser = Environment.GetEnvironmentVariable("KEYCLOAK_ADMIN");
-    opt.AdminPassword = Environment.GetEnvironmentVariable("KEYCLOAK_ADMIN_PASSWORD");
+    opt.AdminUser = Environment.GetEnvironmentVariable("KEYCLOAK_DEFAULT_ADMIN");
+    opt.AdminPassword = Environment.GetEnvironmentVariable("KEYCLOAK_DEFAULT_PASSWORD");
+    opt.AdminClientId = "admin-cli";
+    opt.AdminClientSecret = "secret";
 });
 builder.Services.AddHttpClient<IKeycloakSetupService, KeycloakSetupService>();
 
@@ -65,10 +62,7 @@ using (var scope = app.Services.CreateScope())
     await keycloakService.EnsureSetupAsync();
 }
 
-if (app.Environment.IsDevelopment())
-{
-    app.MapOpenApi();
-}
+if (app.Environment.IsDevelopment()) app.MapOpenApi();
 
 app.MapGrpcService<AuthService>();
 

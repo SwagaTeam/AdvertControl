@@ -3,8 +3,7 @@
 public interface IKeycloakSetupService
 {
     Task EnsureSetupAsync();
-    string GetKeycloakRegistrationUrl(string realm, string clientId, string redirectUri);
-    Task<string> GetJwtTokenAsync(string clientId, string username, string password, string realmName);
-    Task CreateUserAsync(string username, string password, string realmName);
+    Task<string> GetJwtTokenAsync(string username, string password, string? realmName = null);
+    Task CreateUserAsync(string username, string password, string[] roles, string realmName);
     Task<bool> LogoutAsync(string accessToken);
 }
