@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <PackageReference Include="Avalonia" Version="11.3.6" />
+    <PackageReference Include="Avalonia.Controls.MediaPlayer" Version="11.3.5" />
     <PackageReference Include="Avalonia.Desktop" Version="11.3.6" />
     <PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.6" />
     <PackageReference Include="Avalonia.Fonts.Inter" Version="11.3.6" />
@@ -27,5 +28,8 @@
   </ItemGroup>
 	<ItemGroup>
     <ProjectReference Include="..\..\..\Server\AdControl.Protos\AdControl.Protos.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <AvaloniaUILicenseKey Include="avln_on_key:v1:796b878acd8e4386a4f16fb0f1ee83f0" />
   </ItemGroup>
 </Project>
