@@ -47,13 +47,41 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("logout")]
-    public async Task<IActionResult> Logout(LogoutDto dto)
+    public async Task<IActionResult> Logout()
     {
+        var token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+
         var request = new LogoutRequest
         {
-            Token = dto.Token
+            Token = token
         };
         var resp = await authServiceClient.LogoutAsync(request);
+        return Ok(resp);
+    }
+
+    [HttpPost("get-current-user-id")]
+    public async Task<IActionResult> GetCurrentUserId()
+    {
+        var token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+        var request = new UserIdRequest
+        {
+            Token = token
+        };
+        
+        var resp = await authServiceClient.GetCurrentUserIdAsync(request);
+        return Ok(resp);
+    }
+
+    [HttpPost("get-user-info-by/{id}")]
+    public async Task<IActionResult> GetUserInfo(string id)
+    {
+        var request = new UserInfoRequest
+        {
+            Id = id
+        };
+
+        var resp = await authServiceClient.GetUserInfoAsync(request);
+
         return Ok(resp);
     }
 }
