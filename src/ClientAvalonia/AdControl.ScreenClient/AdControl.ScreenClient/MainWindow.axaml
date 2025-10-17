@@ -95,12 +95,13 @@
                  Classes="code-display"/>
 
         <TextBlock Text="Items:"
+                   IsVisible="False"
                    FontWeight="Bold"
                    FontSize="18"
                    Foreground="#24292E"
                    Margin="0 10 0 0"/>
 
-        <ScrollViewer Height="350">
+        <ScrollViewer Height="350" IsVisible="False">
             <ItemsControl Name="ItemsList" ItemsSource="{Binding Items}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate x:DataType="services:ConfigItemDto">
@@ -131,9 +132,78 @@
         <MediaPlayerControl x:Name="VideoPlayerControl"
                                   HorizontalAlignment="Stretch"
                                   VerticalAlignment="Stretch"
-                                  Height="300"
+                                  IsLoopingEnabled="True"
                                   Margin="10"
-                                  IsVisible="False" /> <!-- Скрыто по умолчанию, будет видно при проигрывании видео -->
+                                  Height="{Binding Height}"
+                                  IsVisible="False" />
+        <Image x:Name="ImageControl"
+                            HorizontalAlignment="Stretch"
+                            VerticalAlignment="Stretch"
+                            Margin="10"
+                            Height="{Binding Height}"
+                            IsVisible="False" />
+        <UserControl>
+            <UserControl.Resources>
+                <screenClient:ExpandoPropertyConverter x:Key="ExpandoConverter"/>
+            </UserControl.Resources>
 
-    </StackPanel>
+        </UserControl>
+		<DataGrid x:Name="JsonTable"
+          Margin="20"
+          IsReadOnly="False"
+          GridLinesVisibility="All"
+          BorderThickness="1"
+          BorderBrush="Gray"
+          AutoGenerateColumns="False"
+          RowHeight="40"
+          FontSize="18"
+          FontFamily="Segoe UI"
+          HorizontalAlignment="Stretch"
+          VerticalAlignment="Stretch"
+          ColumnWidth="*"
+          HeadersVisibility="Column">
+
+			<DataGrid.Styles>
+				<!-- Стиль для строк -->
+				<Style Selector="DataGridRow">
+					<Setter Property="Background" Value="White"/>
+					<Setter Property="Foreground" Value="Black"/>
+					<Setter Property="FontSize" Value="18"/>
+					<Setter Property="Height" Value="40"/>
+				</Style>
+
+				<!-- Контраст для четных строк -->
+				<Style Selector="DataGridRow:nth-child(even)">
+					<Setter Property="Background" Value="#FFF0F0F0"/>
+				</Style>
+
+				<!-- Стиль для заголовков -->
+				<Style Selector="DataGridColumnHeader">
+					<Setter Property="Background" Value="#FFDDDDDD"/>
+					<Setter Property="FontWeight" Value="Bold"/>
+					<Setter Property="FontSize" Value="18"/>
+					<Setter Property="Foreground" Value="Black"/>
+					<Setter Property="HorizontalContentAlignment" Value="Center"/>
+				</Style>
+
+				<!-- Стиль для ячеек -->
+				<Style Selector="DataGridCell">
+					<Setter Property="Padding" Value="10,0"/>
+					<Setter Property="FontSize" Value="18"/>
+					<Setter Property="Foreground" Value="Black"/>
+					<Setter Property="Background" Value="Transparent"/>
+					<Setter Property="HorizontalContentAlignment" Value="Center"/>
+					<Setter Property="VerticalContentAlignment" Value="Center"/>
+				</Style>
+
+				<!-- Hover эффект -->
+				<Style Selector="DataGridRow:hover">
+					<Setter Property="Background" Value="#FFD0E0FF"/>
+				</Style>
+
+			</DataGrid.Styles>
+		</DataGrid>
+        
+
+	</StackPanel>
 </Window>
