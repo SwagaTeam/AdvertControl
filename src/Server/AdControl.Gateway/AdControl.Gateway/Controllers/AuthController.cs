@@ -81,6 +81,17 @@ public class AuthController : ControllerBase
     [HttpPost("get-user-info-by/{id}")]
     public async Task<IActionResult> GetUserInfo(string id)
     {
+        var token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+
+        var requestUserId = new UserIdRequest
+        {
+            Token = token
+        };
+        var currentUserId = await authServiceClient.GetCurrentUserIdAsync(requestUserId);
+        if (id != currentUserId.Id)
+        {
+            return Unauthorized();
+        }
         var request = new UserInfoRequest
         {
             Id = id
