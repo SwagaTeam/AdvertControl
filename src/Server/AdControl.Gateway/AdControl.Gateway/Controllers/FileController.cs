@@ -30,10 +30,13 @@ public class FileController : ControllerBase
     {
         using var ms = new MemoryStream();
         await file.CopyToAsync(ms);
+        var extension = Path.GetExtension(file.FileName);
+        var safeFileName = Path.GetFileNameWithoutExtension(file.FileName);
+        var newFileName = $"{safeFileName}-{Guid.NewGuid()}{extension}";
 
         var request = new UploadFileRequest
         {
-            FileName = file.FileName,
+            FileName = newFileName,
             FileData = ByteString.CopyFrom(ms.ToArray())
         };
 

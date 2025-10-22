@@ -283,6 +283,9 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         _screenId = string.Empty;
         Items.Clear();
         StatusText.Text = "Экран не привязан.";
+        VideoViewControl.IsVisible = false;
+        ImageControl.IsVisible = false;
+        JsonTable.IsVisible = false;
         await DeleteScreenId();
         await Dispatcher.UIThread.InvokeAsync(() => SetState(ScreenState.NotPaired));
     }
