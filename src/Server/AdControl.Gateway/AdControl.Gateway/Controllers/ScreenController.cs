@@ -20,9 +20,15 @@ public class ScreenController : ControllerBase
         _redis = redis;
     }
 
-    // POST api/screen
+    /// <summary>
+    ///     Создаёт экран.
+    /// </summary>
+    /// <response code="201">Экран успешно создан</response>
+    /// <response code="500">Ошибка при создании экрана</response>
     [HttpPost]
     [Authorize]
+    [ProducesResponseType(typeof(object), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(object), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> Create([FromBody] CreateScreenDto dto)
     {
         var req = new CreateScreenRequest
@@ -42,9 +48,15 @@ public class ScreenController : ControllerBase
         return CreatedAtAction(nameof(GetById), new { id = resp.Id }, new { id = resp.Id, status = resp.Status });
     }
 
-    // GET api/screen/{id}
+    /// <summary>
+    ///     Получает экран по идентификатору.
+    /// </summary>
+    /// <response code="200">Экран найден</response>
+    /// <response code="404">Экран не найден</response>
     [HttpGet("{id}")]
     [Authorize]
+    [ProducesResponseType(typeof(Screen), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetById(string id)
     {
         var req = new GetScreenRequest { Id = id };
@@ -55,9 +67,13 @@ public class ScreenController : ControllerBase
         return Ok(resp.Screen);
     }
 
-    // GET api/screen?filterName=...&limit=50&offset=0
+    /// <summary>
+    ///     Возвращает список экранов с фильтрацией.
+    /// </summary>
+    /// <response code="200">Список успешно получен</response>
     [HttpGet]
     [Authorize]
+    [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
     public async Task<IActionResult> List([FromQuery] string? filterName, [FromQuery] int limit = 50,
         [FromQuery] int offset = 0)
     {
@@ -66,9 +82,13 @@ public class ScreenController : ControllerBase
         return Ok(new { items = resp.Screens, total = resp.Total });
     }
 
-    // DELETE api/screen/{id}
+    /// <summary>
+    ///     Удаление экрана (не реализовано).
+    /// </summary>
+    /// <response code="501">Метод не реализован</response>
     [HttpDelete("{id}")]
     [Authorize]
+    [ProducesResponseType(StatusCodes.Status501NotImplemented)]
     public async Task<IActionResult> Delete(string id)
     {
         var metadata = BuildAuthMetadata(HttpContext);
@@ -77,19 +97,19 @@ public class ScreenController : ControllerBase
         return StatusCode(501, "Delete not implemented in proto");
     }
 
-
-    private Metadata BuildAuthMetadata(HttpContext http)
-    {
-        var metadata = new Metadata();
-        if (http.Request.Headers.TryGetValue("Authorization", out var auth))
-            metadata.Add("Authorization", auth.ToString());
-        return metadata;
-    }
-
-    // POST api/screen/pair/confirm
-    // От веба (Authenticated). Подтверждает код, создаёт Screen в ScreenService и связывает.
+    /// <summary>
+    ///     Подтверждает код привязки экрана и создаёт экран в ScreenService.
+    /// </summary>
+    /// <response code="200">Привязка подтверждена</response>
+    /// <response code="400">Некорректный код</response>
+    /// <response code="404">Код не найден или истёк</response>
+    /// <response code="500">Ошибка при создании экрана</response>
     [HttpPost("pair/confirm")]
     [Authorize]
+    [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> ConfirmPair([FromBody] ConfirmPairDto dto)
     {
         if (string.IsNullOrWhiteSpace(dto.Code)) return BadRequest();
@@ -99,7 +119,6 @@ public class ScreenController : ControllerBase
         var tempId = await db.StringGetAsync(key);
         if (tempId.IsNullOrEmpty) return NotFound(new { error = "code not found or expired" });
 
-        // Создаём экран в downstream gRPC сервисе от имени текущего пользователя (пробрасываем Authorization)
         var createReq = new CreateScreenRequest
         {
             Name = dto.Name ?? "Unnamed",
@@ -115,10 +134,17 @@ public class ScreenController : ControllerBase
         await db.StringSetAsync(assignedKey, resp.Id,
             TimeSpan.FromMinutes(dto.AssignedTtlMinutes > 0 ? dto.AssignedTtlMinutes : 60));
 
-        // cleanup pairing code
         await db.KeyDeleteAsync(key);
         await db.KeyDeleteAsync($"pair:meta:{tempId}");
 
         return Ok(new { id = resp.Id, status = resp.Status });
+    }
+
+    private Metadata BuildAuthMetadata(HttpContext http)
+    {
+        var metadata = new Metadata();
+        if (http.Request.Headers.TryGetValue("Authorization", out var auth))
+            metadata.Add("Authorization", auth.ToString());
+        return metadata;
     }
 }

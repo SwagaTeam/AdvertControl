@@ -20,8 +20,15 @@ public class ConfigController : ControllerBase
         _authServiceClient = authServiceClient;
     }
 
+    /// <summary>
+    ///     Создаёт конфигурацию (Config) с элементами.
+    /// </summary>
+    /// <response code="201">Конфигурация создана</response>
+    /// <response code="500">Ошибка при создании</response>
     [HttpPost]
     [Authorize]
+    [ProducesResponseType(typeof(object), StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> Create([FromBody] CreateConfigDto dto)
     {
         var req = new CreateConfigRequest();
@@ -36,7 +43,7 @@ public class ConfigController : ControllerBase
                 var ci = new ConfigItem
                 {
                     Id = it.Id ?? Guid.CreateVersion7().ToString(),
-                    ConfigId = "", // сервис создаст
+                    ConfigId = "",
                     Type = type,
                     Url = it.Url ?? "",
                     InlineData = it.InlineData ?? "",
@@ -53,8 +60,15 @@ public class ConfigController : ControllerBase
         return CreatedAtAction(nameof(GetById), new { id = resp.Id }, new { id = resp.Id });
     }
 
+    /// <summary>
+    ///     Получает конфигурацию по идентификатору.
+    /// </summary>
+    /// <response code="200">Конфигурация найдена</response>
+    /// <response code="404">Конфигурация не найдена</response>
     [HttpGet("{id}")]
     [Authorize]
+    [ProducesResponseType(typeof(Config), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetById(string id)
     {
         var resp = await _screenClient.GetConfigAsync(new GetConfigRequest { Id = id }, BuildAuthMetadata(HttpContext))
@@ -63,8 +77,15 @@ public class ConfigController : ControllerBase
         return Ok(resp.Config);
     }
 
+    /// <summary>
+    ///     Назначает конфигурацию экрану.
+    /// </summary>
+    /// <response code="200">Конфигурация успешно назначена</response>
+    /// <response code="500">Ошибка при назначении</response>
     [HttpPost("{id}/assign")]
     [Authorize]
+    [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> Assign(string id, [FromBody] AssignDto dto)
     {
         var req = new AssignConfigRequest { ScreenId = dto.ScreenId, ConfigId = id, IsActive = dto.IsActive };

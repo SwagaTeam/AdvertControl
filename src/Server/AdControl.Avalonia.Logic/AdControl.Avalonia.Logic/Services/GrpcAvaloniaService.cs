@@ -66,8 +66,8 @@ public class GrpcAvaloniaService : AvaloniaLogicService.AvaloniaLogicServiceBase
                      {
                          Id = it.Id.ToString(),
                          ConfigId = it.ConfigId.ToString(),
-                         Url = it.UrlOrData,
-                         InlineData = it.UrlOrData.StartsWith("{") ? it.UrlOrData : string.Empty,
+                         Url = it.Url,
+                         InlineData = it.InlineData,
                          Checksum = it.Checksum ?? string.Empty,
                          Size = it.Size,
                          DurationSeconds = it.DurationSeconds,

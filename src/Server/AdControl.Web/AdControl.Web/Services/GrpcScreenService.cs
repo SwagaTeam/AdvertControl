@@ -97,7 +97,8 @@ public class GrpcScreenService : ScreenService.ScreenServiceBase
                 Id = string.IsNullOrEmpty(i.Id) ? Guid.NewGuid() : Guid.Parse(i.Id),
                 ConfigId = Guid.Empty, // will be set in service
                 Type = i.Type.ToString(),
-                UrlOrData = string.IsNullOrEmpty(i.Url) ? i.InlineData ?? "" : i.Url,
+                Url = i.Url,
+                InlineData = i.InlineData,
                 Checksum = i.Checksum,
                 Size = i.Size,
                 DurationSeconds = i.DurationSeconds,
@@ -132,8 +133,8 @@ public class GrpcScreenService : ScreenService.ScreenServiceBase
                 Type = Enum.TryParse<ItemType>(it.Type, true, out var t)
                     ? t
                     : ItemType.Image,
-                Url = it.UrlOrData,
-                InlineData = it.UrlOrData,
+                Url = it.Url,
+                InlineData = it.InlineData,
                 Checksum = it.Checksum ?? "",
                 Size = it.Size,
                 DurationSeconds = it.DurationSeconds,
