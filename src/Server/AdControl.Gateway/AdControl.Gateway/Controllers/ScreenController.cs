@@ -44,7 +44,7 @@ public class ScreenController : ControllerBase
 
     // GET api/screen/{id}
     [HttpGet("{id}")]
-    //[Authorize]
+    [Authorize]
     public async Task<IActionResult> GetById(string id)
     {
         var req = new GetScreenRequest { Id = id };
@@ -53,6 +53,19 @@ public class ScreenController : ControllerBase
         if (resp.Screen == null || string.IsNullOrEmpty(resp.Screen.Id))
             return NotFound();
         return Ok(resp.Screen);
+    }
+
+    // GET api/screen/is-assigned/{id}
+    [HttpGet("is-assigned/{id}")]
+    //[Authorize]
+    public async Task<IActionResult> IsAssigned(string id)
+    {
+        var req = new GetScreenRequest { Id = id };
+        var metadata = BuildAuthMetadata(HttpContext);
+        var resp = await _screenClient.GetScreenAsync(req, metadata).ResponseAsync;
+        if (resp.Screen == null || string.IsNullOrEmpty(resp.Screen.Id))
+            return NotFound(false);
+        return Ok(true);
     }
 
     // GET api/screen?filterName=...&limit=50&offset=0

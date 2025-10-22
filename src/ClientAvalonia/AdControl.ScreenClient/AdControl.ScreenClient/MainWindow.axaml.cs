@@ -7,6 +7,7 @@ using System.Dynamic;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
 using AdControl.ScreenClient.Enums;
@@ -41,8 +42,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
         var cfg = App.Services?.GetService<IConfiguration>();
         _screenId = cfg?["Screen:Id"] ?? Environment.GetEnvironmentVariable("SCREEN_ID") ?? string.Empty;
-        _intervalSeconds = int.TryParse(cfg?["Polling:IntervalSeconds"], out var s) ? s : 5;
 
+        _intervalSeconds = int.TryParse(cfg?["Polling:IntervalSeconds"], out var s) ? s : 5;
 
         // Bind DataContext for ListBox (if Items is bound to ListBox in XAML)
         DataContext = this;
@@ -371,8 +372,10 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                     StatusText.Text = $"Paired. ScreenId={_screenId}";
                     SetState(ScreenState.Paired);
 
+                    await SaveScreenIdToAppSettingsAsync(_screenId);
+
                     // Start polling loop after pairing
-                    _ = StartLoopAsync(_cts.Token);
+                    await StartLoopAsync(_cts.Token);
 
                     return;
                 }
@@ -386,5 +389,34 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
         StatusText.Text = "Pairing timed out.";
         SetState(ScreenState.NotPaired);
+    }
+
+    private async Task SaveScreenIdToAppSettingsAsync(string screenId)
+    {
+        try
+        {
+            var path = Path.Combine(AppContext.BaseDirectory, "appsettings.json");
+            if (!File.Exists(path))
+            {
+                // если файла нет, создаём минимальную структуру
+                var root = new JsonObject { ["Screen"] = new JsonObject { ["Id"] = screenId } };
+                await File.WriteAllTextAsync(path,
+                    root.ToJsonString(new JsonSerializerOptions { WriteIndented = true }));
+                return;
+            }
+
+            var json = await File.ReadAllTextAsync(path);
+            var node = JsonNode.Parse(json) ?? new JsonObject();
+
+            if (node["Screen"] == null) node["Screen"] = new JsonObject();
+            node["Screen"]["Id"] = screenId;
+
+            await File.WriteAllTextAsync(path, node.ToJsonString(new JsonSerializerOptions { WriteIndented = true }));
+        }
+        catch (Exception ex)
+        {
+            // Показываем ошибку в UI, но не ломаем поток привязки
+            await Dispatcher.UIThread.InvokeAsync(() => StatusText.Text = $"Saving config failed: {ex.Message}");
+        }
     }
 }
