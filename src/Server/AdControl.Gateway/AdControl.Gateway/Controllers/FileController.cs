@@ -1,5 +1,5 @@
 using AdControl.Protos;
-using Google.Protobuf;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AdControl.Gateway.Controllers;
@@ -16,6 +16,7 @@ public class FileController : ControllerBase
     }
 
     [HttpPost("upload")]
+    [Authorize]
     public async Task<IActionResult> Upload(IFormFile file)
     {
         using var ms = new MemoryStream();
@@ -32,6 +33,7 @@ public class FileController : ControllerBase
     }
 
     [HttpGet("{fileName}")]
+    [Authorize]
     public async Task<IActionResult> Get(string fileName)
     {
         var request = new GetFileRequest { FileName = fileName };
@@ -39,14 +41,15 @@ public class FileController : ControllerBase
 
         return File(resp.FileData.ToByteArray(), "application/octet-stream", fileName);
     }
-
-    [HttpGet("by-url/{url}")]
+    
+    [HttpGet("by-url/{*url}")]
+    [Authorize]
     public async Task<IActionResult> GetByUrl(string url)
     {
         var decodedUrl = Uri.UnescapeDataString(url);
 
         var fileName = decodedUrl.Split('/').LastOrDefault();
-
+        Console.WriteLine(fileName);
         return await Get(fileName);
     }
 }
