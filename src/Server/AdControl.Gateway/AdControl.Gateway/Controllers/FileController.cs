@@ -38,4 +38,12 @@ public class FileController : ControllerBase
 
         return File(resp.FileData.ToByteArray(), "application/octet-stream", fileName);
     }
+    
+    [HttpGet("by-url/{url}")]
+    public async Task<IActionResult> GetByUrl(string url)
+    {
+        var uri = new Uri(url);
+        var fileName = Path.GetFileName(uri.AbsolutePath);
+        return await Get(fileName);
+    }
 }
