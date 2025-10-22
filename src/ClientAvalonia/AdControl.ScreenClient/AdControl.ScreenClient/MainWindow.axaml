@@ -2,11 +2,13 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:screenClient="clr-namespace:AdControl.ScreenClient"
         xmlns:services="clr-namespace:AdControl.ScreenClient.Services"
+        xmlns:vlc="clr-namespace:LibVLCSharp.Avalonia;assembly=LibVLCSharp.Avalonia"
         x:DataType="screenClient:MainWindow"
         x:CompileBindings="True"
         x:Class="AdControl.ScreenClient.MainWindow"
         Title="AdControl Screen Client"
-        Width="700" Height="550"
+        WindowState="FullScreen"
+        SystemDecorations="None"
         Background="#F5F7FA"
         WindowStartupLocation="CenterScreen">
 
@@ -32,15 +34,35 @@
         <Style Selector="Button.primary:pressed /template/ ContentPresenter">
             <Setter Property="Background" Value="#006BCB"/>
         </Style>
-
+        <Style Selector="Button.exit">
+            <Setter Property="Background" Value="#FFE57373"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="Height" Value="40"/>
+            <Setter Property="CornerRadius" Value="4"/>
+            <Setter Property="BorderBrush" Value="#CDD5E1"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Transitions">
+                <Transitions>
+                    <BrushTransition Property="Background" Duration="0.1"/>
+                </Transitions>
+            </Setter>
+        </Style>
+        <Style Selector="Button.exit:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#FFD32F2F"/>
+        </Style>
         <Style Selector="Button.outline">
-            <Setter Property="Background" Value="Transparent"/>
-            <Setter Property="Foreground" Value="#4C5870"/>
+            <Setter Property="Background" Value="#0078D7"/>
+            <Setter Property="Foreground" Value="White"/>
             <Setter Property="BorderBrush" Value="#CDD5E1"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="FontSize" Value="16"/>
             <Setter Property="Height" Value="40"/>
             <Setter Property="CornerRadius" Value="4"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
             <Setter Property="Transitions">
                 <Transitions>
                     <BrushTransition Property="Background" Duration="0.1"/>
@@ -55,53 +77,251 @@
         </Style>
 
         <Style Selector="Label.code-display">
-            <Setter Property="FontSize" Value="28" />
+            <Setter Property="FontSize" Value="92" />
             <Setter Property="FontWeight" Value="Bold" />
             <Setter Property="VerticalContentAlignment" Value="Center" />
-            <Setter Property="Background" Value="#EAF0F6"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="#0b60e0"></Setter>
             <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="CornerRadius" Value="4"/>
         </Style>
+        <Style Selector="ToggleButton#HeaderToggle">
+            <Setter Property="Background" Value="#FFFFFFFF"/>
+            <Setter Property="Foreground" Value="#1565C0"/>
+            <Setter Property="BorderBrush" Value="#CDD5E1"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="6"/>
+            <Setter Property="Padding" Value="6,4"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Transitions">
+                <Transitions>
+                    <BrushTransition Property="Background" Duration="0.12"/>
+                    <BrushTransition Property="BorderBrush" Duration="0.12"/>
+                    <DoubleTransition Property="Opacity" Duration="0.2" Easing="CubicEaseOut"/>
+                </Transitions>
+            </Setter>
+        </Style>
+
+        <!-- Hover -->
+        <Style Selector="ToggleButton#HeaderToggle:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#FFF5FBFF"/>
+            <Setter Property="BorderBrush" Value="#A6C8F0"/>
+        </Style>
+
+        <!-- Pressed -->
+        <Style Selector="ToggleButton#HeaderToggle:pressed /template/ ContentPresenter">
+            <Setter Property="Background" Value="#FFEAF6FF"/>
+            <Setter Property="BorderBrush" Value="#7FB8E6"/>
+        </Style>
+
+        <!-- Checked: фон/рамка для состояния "свернуто/развёрнуто" -->
+        <Style Selector="ToggleButton#HeaderToggle:checked /template/ ContentPresenter">
+            <Setter Property="Background" Value="#EAF6FF"/>
+            <Setter Property="BorderBrush" Value="#5AA0DD"/>
+            <Setter Property="Foreground" Value="#0B57A6"/>
+        </Style>
+
+        <Style Selector="Grid#HeaderBar:pointerover ToggleButton#HeaderToggle">
+            <Setter Property="Opacity" Value="1"/>
+        </Style>
+
+        <Style Selector="ToggleButton#HeaderToggle:checked">
+            <Setter Property="Opacity" Value="1"/>
+        </Style>
+       
     </Window.Styles>
 
-    <StackPanel Margin="24" Spacing="16">
+	<Grid Margin="0">
 
-        <TextBlock Name="StatusText"
-                   FontSize="16"
-                   FontWeight="SemiBold"
-                   Foreground="#4C5870"/>
+        <!-- Панель с контентом-->
+		<Grid  ZIndex="0">
+			<!-- Видео -->
+			<vlc:VideoView x:Name="VideoViewControl"
+                           HorizontalAlignment="Stretch"
+                           VerticalAlignment="Stretch"
+                           Margin="0"
+                           IsVisible="False" 
+                           />
 
-        <StackPanel Orientation="Horizontal" Spacing="12">
-            <Button Name="StartPairButton"
-                    Content="Start Pairing"
-                    Width="160"
-                    Classes="primary"
-                    Click="StartPairButton_Click"/>
+			<!-- Изображение -->
+			<Image x:Name="ImageControl"
+                   HorizontalAlignment="Stretch"
+                   VerticalAlignment="Stretch"
+                   Margin="0"
+                   Stretch="UniformToFill"
+                   IsVisible="True" />
 
-            <Button Name="UnpairButton"
-                    Content="Unpair"
-                    Width="160"
-                    Classes="outline"
-                    Click="UnpairButton_Click"
-                    IsVisible="False"/>
-        </StackPanel>
+			<!-- Таблица -->
+			<DataGrid x:Name="JsonTable"
+          Margin="20"
+          IsReadOnly="True"
+          GridLinesVisibility="None"
+          BorderThickness="0"
+          AutoGenerateColumns="False"
+          RowHeight="50"
+          FontSize="20"
+          FontFamily="Segoe UI"
+          HorizontalAlignment="Stretch"
+          VerticalAlignment="Stretch"
+          ColumnWidth="*"
+          HeadersVisibility="Column"
+          Background="#F5F7FA"
+          IsVisible="True">
 
-        <Border Height="1" Background="#E0E0E0" Margin="0 8" />
+    <DataGrid.Styles>
+        <!-- Ряды -->
+        <Style Selector="DataGridRow">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="Foreground" Value="#222222"/>
+            <Setter Property="FontSize" Value="20"/>
+            <Setter Property="Height" Value="50"/>
+            <Setter Property="CornerRadius" Value="6"/>
+            <Setter Property="Margin" Value="2,2,2,2"/>
+            <Setter Property="Padding" Value="12,0"/>
+            <Setter Property="BorderBrush" Value="#E0E0E0"/>
+            <Setter Property="BorderThickness" Value="1"/>
+        </Style>
 
-        <Label Name="PairCodeText"
-                 Width="240"
-                 Height="50"
-                 Content="CODE"
-                 Classes="code-display"/>
+        <!-- Чередование рядов -->
+        <Style Selector="DataGridRow:nth-child(even)">
+            <Setter Property="Background" Value="#F0F4F8"/>
+        </Style>
 
-        <TextBlock Text="Items:"
-                   IsVisible="False"
-                   FontWeight="Bold"
-                   FontSize="18"
-                   Foreground="#24292E"
-                   Margin="0 10 0 0"/>
+        <!-- Hover эффект -->
+        <Style Selector="DataGridRow:hover">
+            <Setter Property="Background" Value="#D9E8FF"/>
+            <Setter Property="Foreground" Value="#0B57A6"/>
+        </Style>
 
-        <ScrollViewer Height="350" IsVisible="False">
+        <!-- Заголовки -->
+        <Style Selector="DataGridColumnHeader">
+            <Setter Property="Background" Value="#0078D7"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="FontSize" Value="20"/>
+            <Setter Property="Height" Value="60"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Padding" Value="10,0"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="CornerRadius" Value="6"/>
+        </Style>
+
+        <!-- Ячейки -->
+        <Style Selector="DataGridCell">
+            <Setter Property="Padding" Value="12,0"/>
+            <Setter Property="FontSize" Value="18"/>
+            <Setter Property="Foreground" Value="#222222"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="BorderThickness" Value="0"/>
+        </Style>
+
+        <!-- Выделение ряда -->
+        <Style Selector="DataGridRow:focus, DataGridRow:selected">
+            <Setter Property="Background" Value="#0B57A6"/>
+            <Setter Property="Foreground" Value="White"/>
+        </Style>
+
+        <!-- Сетка (линии между ячейками) -->
+        <Style Selector="DataGridCell:focus">
+            <Setter Property="BorderBrush" Value="#0078D7"/>
+            <Setter Property="BorderThickness" Value="1"/>
+        </Style>
+    </DataGrid.Styles>
+</DataGrid>
+
+		</Grid>
+
+		<!-- Верхняя панель (Header) -->
+		<Grid x:Name="HeaderArea"
+			  Background="Transparent"
+			  ZIndex="100"
+              Margin="15"
+              VerticalAlignment="Top"
+			  RowDefinitions="Auto,*">
+
+			<!-- Шапка -->
+			<Grid Grid.Row="0" Height="96" x:Name="HeaderBar"
+                  Background="Transparent"
+                  PointerEntered="HeaderBar_OnPointerEntered"
+                  PointerExited="HeaderBar_OnPointerExited">
+
+                <ToggleButton x:Name="HeaderToggle"
+                              Width="70"
+                              Height="48"
+                              HorizontalAlignment="Right"
+                              VerticalAlignment="Top"
+                              Margin="8"
+                              Opacity="0"
+                              Click="HeaderToggle_Click"
+                              RenderTransformOrigin="0.5,0.5">
+                    <ToggleButton.Transitions>
+                        <Transitions>
+                            <DoubleTransition Property="Opacity" Duration="0:0:0.2"/>
+                        </Transitions>
+                    </ToggleButton.Transitions>
+
+                    <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
+                        <TextBlock Text="Ad" FontSize="14" Foreground="#1565C0" FontWeight="Bold"/>
+                        <TextBlock Text="Control" FontSize="11" Foreground="#1565C0" FontWeight="Bold"/>
+                    </StackPanel>
+                </ToggleButton>
+                <StackPanel x:Name="HeaderContent"
+                            Orientation="Vertical"
+                            Margin="48,0,0,0"
+                            Spacing="12">
+					<TextBlock x:Name="StatusText"
+							   FontSize="16"
+							   FontWeight="SemiBold"
+							   Foreground="White"
+                               Background="#0078D7"
+                               Width="500"
+                               Height="20"
+                               VerticalAlignment="Center"
+                               HorizontalAlignment="Center"
+                               TextAlignment="Center"
+                               />
+
+					<StackPanel Orientation="Horizontal" Spacing="12">
+						<Button x:Name="StartPairButton"
+								Content="Привязать экран"
+								Width="160"
+								Classes="primary"
+								Click="StartPairButton_Click"/>
+						<Button x:Name="UnpairButton"
+								Content="Отвязать экран"
+								Width="160"
+								Classes="outline"
+								Click="UnpairButton_Click"
+								IsVisible="False"/>
+                        <Button x:Name="ExitButton"
+                                Content="Закрыть приложение"
+                                FontSize="12"
+                                Width="160"
+                                Classes="exit"
+                                Click="ExitButton_Click"/>
+					</StackPanel>
+				</StackPanel>
+			</Grid>
+
+			<!-- Раскрывающаяся область -->
+			<Border Grid.Row="1"
+					x:Name="HeaderExpandedArea"
+					Background="#F5F7FA"
+					IsVisible="False">
+				<Label Name="PairCodeText"
+					   Content="Здесь будет код"
+					   Classes="code-display"
+					   HorizontalAlignment="Center"
+					   VerticalAlignment="Center"
+					   HorizontalContentAlignment="Center"
+					   VerticalContentAlignment="Center"/>
+			</Border>
+		</Grid>
+
+        <ScrollViewer Height="150" IsVisible="False">
             <ItemsControl Name="ItemsList" ItemsSource="{Binding Items}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate x:DataType="services:ConfigItemDto">
@@ -128,82 +348,5 @@
             </ItemsControl>
         </ScrollViewer>
 
-        <!-- Добавляем элемент для отображения видео -->
-        <MediaPlayerControl x:Name="VideoPlayerControl"
-                                  HorizontalAlignment="Stretch"
-                                  VerticalAlignment="Stretch"
-                                  IsLoopingEnabled="True"
-                                  Margin="10"
-                                  Height="{Binding Height}"
-                                  IsVisible="False" />
-        <Image x:Name="ImageControl"
-                            HorizontalAlignment="Stretch"
-                            VerticalAlignment="Stretch"
-                            Margin="10"
-                            Height="{Binding Height}"
-                            IsVisible="False" />
-        <UserControl>
-            <UserControl.Resources>
-                <screenClient:ExpandoPropertyConverter x:Key="ExpandoConverter"/>
-            </UserControl.Resources>
-
-        </UserControl>
-		<DataGrid x:Name="JsonTable"
-          Margin="20"
-          IsReadOnly="False"
-          GridLinesVisibility="All"
-          BorderThickness="1"
-          BorderBrush="Gray"
-          AutoGenerateColumns="False"
-          RowHeight="40"
-          FontSize="18"
-          FontFamily="Segoe UI"
-          HorizontalAlignment="Stretch"
-          VerticalAlignment="Stretch"
-          ColumnWidth="*"
-          HeadersVisibility="Column">
-
-			<DataGrid.Styles>
-				<!-- Стиль для строк -->
-				<Style Selector="DataGridRow">
-					<Setter Property="Background" Value="White"/>
-					<Setter Property="Foreground" Value="Black"/>
-					<Setter Property="FontSize" Value="18"/>
-					<Setter Property="Height" Value="40"/>
-				</Style>
-
-				<!-- Контраст для четных строк -->
-				<Style Selector="DataGridRow:nth-child(even)">
-					<Setter Property="Background" Value="#FFF0F0F0"/>
-				</Style>
-
-				<!-- Стиль для заголовков -->
-				<Style Selector="DataGridColumnHeader">
-					<Setter Property="Background" Value="#FFDDDDDD"/>
-					<Setter Property="FontWeight" Value="Bold"/>
-					<Setter Property="FontSize" Value="18"/>
-					<Setter Property="Foreground" Value="Black"/>
-					<Setter Property="HorizontalContentAlignment" Value="Center"/>
-				</Style>
-
-				<!-- Стиль для ячеек -->
-				<Style Selector="DataGridCell">
-					<Setter Property="Padding" Value="10,0"/>
-					<Setter Property="FontSize" Value="18"/>
-					<Setter Property="Foreground" Value="Black"/>
-					<Setter Property="Background" Value="Transparent"/>
-					<Setter Property="HorizontalContentAlignment" Value="Center"/>
-					<Setter Property="VerticalContentAlignment" Value="Center"/>
-				</Style>
-
-				<!-- Hover эффект -->
-				<Style Selector="DataGridRow:hover">
-					<Setter Property="Background" Value="#FFD0E0FF"/>
-				</Style>
-
-			</DataGrid.Styles>
-		</DataGrid>
-        
-
-	</StackPanel>
+    </Grid>
 </Window>

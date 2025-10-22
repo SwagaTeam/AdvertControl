@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net;
-using System.Net.Http;
+﻿using System.Net;
 using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
 using AdControl.Protos;
 
 namespace AdControl.ScreenClient.Services;
@@ -161,6 +157,41 @@ public class PollingService
         catch
         {
             return (false, null);
+        }
+    }
+
+    public async Task<bool?> IsScreenExistAsync(string screenId)
+    {
+        var client = _http.CreateClient("gateway");
+        try
+        {
+            var url = $"/api/polling/is-assigned/{Uri.EscapeDataString(screenId)}";
+            var resp = await client.GetAsync(url);
+
+            var content = await resp.Content.ReadAsStringAsync();
+
+            return bool.Parse(content);
+        }
+        catch (HttpRequestException)
+        {
+        }
+        catch (TaskCanceledException)
+        {
+        }
+        catch (Exception)
+        {
+        }
+
+        // fallback gRPC to Avalonia.Logic
+        try
+        {
+            var grpcReq = new IsScreenExistRequest { ScreenId = screenId };
+            var rpc = await _avaloniaClient.IsScreenExistAsync(grpcReq);
+            return rpc.IsExist;
+        }
+        catch (Exception)
+        {
+            return null;
         }
     }
 }
