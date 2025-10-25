@@ -43,4 +43,9 @@ public class ScreenService : IScreenService
         var total = items.Count + offset; // not accurate; for demo keep it simple
         return (items, total);
     }
+
+    public async Task UpdateLastHeartBeatAsync(Guid screenId, CancellationToken ct = default)
+    {
+        await _repo.UpdateLastHeartBeatAsync(screenId, ct);
+    }
 }

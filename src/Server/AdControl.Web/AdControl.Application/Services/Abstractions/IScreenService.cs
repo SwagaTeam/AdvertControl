@@ -11,4 +11,6 @@ public interface IScreenService
 
     Task<(List<Screen> Items, int Total)> ListAsync(string? filter, int limit, int offset,
         CancellationToken ct = default);
+
+    Task UpdateLastHeartBeatAsync(Guid screenId, CancellationToken ct = default);
 }
