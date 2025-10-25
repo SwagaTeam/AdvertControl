@@ -16,7 +16,7 @@ public class ScreenRepository : IScreenRepository
 
     public async Task<Screen?> GetAsync(Guid id, CancellationToken ct = default)
     {
-        return await _db.Screens.Include(s => s.ScreenConfigs).ThenInclude(sc => sc.Config)
+        return await _db.Screens.Include(s => s.ScreenConfigs).ThenInclude(sc => sc.Config).ThenInclude(c => c.Items)
             .FirstOrDefaultAsync(x => x.Id == id, ct);
     }
 
@@ -38,5 +38,12 @@ public class ScreenRepository : IScreenRepository
     {
         _db.Screens.Update(screen);
         await _db.SaveChangesAsync(ct);
+    }
+
+    public async Task UpdateLastHeartBeatAsync(Guid screenId, CancellationToken ct = default)
+    {
+        var screen = await _db.Screens.FirstOrDefaultAsync(x => x.Id == screenId, ct);
+        if (screen is not null)
+            screen.LastHeartbeatAt = DateTime.UtcNow;
     }
 }
