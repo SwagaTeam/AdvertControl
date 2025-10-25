@@ -55,7 +55,7 @@ message CreateScreenResponse { string id = 1; string status = 2; string error = 
 message DeleteScreenRequest { string id = 1; }
 message DeleteScreenResponse { string status = 1; string error = 2; }
 message GetScreenRequest { string id = 1; }
-message GetScreenResponse { Screen screen = 1; }
+message GetScreenResponse { Screen screen = 1; repeated string type = 2;}
 message ListScreensRequest { string filterName = 1; int32 limit = 2; int32 offset = 3; }
 message ListScreensResponse { repeated Screen screens = 1; int32 total = 2; }
 
