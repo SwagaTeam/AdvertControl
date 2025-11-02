@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Immutable;
+using System.ComponentModel.DataAnnotations;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using AdControl.Application.Services.Abstractions;
@@ -75,6 +76,40 @@ public class GrpcScreenService : ScreenService.ScreenServiceBase
             .Select(i => i.Type);
 
         return new GetScreenResponse { Screen = proto, Type = { types } };
+    }
+
+    public override async Task<ListUserScreensResponse> GetListUserScreens(ListUserScreensRequest request, ServerCallContext context)
+    {
+        var userIdString = GetUserIdFromMetadata(context);
+        Guid? userId = null;
+        if (Guid.TryParse(userIdString, out var g))
+            userId = g;
+        else throw new UnauthorizedAccessException();
+        
+        var screenListByUserId = await _screens.GetListByUserIdAsync(Guid.Parse(request.UserId));
+        if (screenListByUserId.Any(s => s.UserId != userId))
+            throw new UnauthorizedAccessException();
+
+        var resp = new ListUserScreensResponse();
+        foreach (var screen in screenListByUserId)
+        {
+            resp.Screens.Add(new Screen
+            {
+                Id = screen.Id.ToString(),
+                UserId = screen.UserId?.ToString() ?? "",
+                Name = screen.Name,
+                Resolution = screen.Resolution,
+                Location = screen.Location,
+                LastHeartbeatAt = screen.LastHeartbeatAt.HasValue ? DateTimeToUnixMs(screen.LastHeartbeatAt.Value) : 0,
+                PairedAt = screen.PairedAt.HasValue ? DateTimeToUnixMs(screen.PairedAt.Value) : 0,
+                CreatedAt = DateTimeToUnixMs(screen.CreatedAt),
+                UpdatedAt = DateTimeToUnixMs(screen.UpdatedAt)
+            });
+        }
+
+        resp.Total = resp.Screens.Count;
+
+        return resp;
     }
 
     public override async Task<ListScreensResponse> ListScreens(ListScreensRequest request, ServerCallContext context)

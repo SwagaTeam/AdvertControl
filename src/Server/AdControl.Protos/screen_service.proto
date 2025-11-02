@@ -58,6 +58,8 @@ message GetScreenRequest { string id = 1; }
 message GetScreenResponse { Screen screen = 1; repeated string type = 2;}
 message ListScreensRequest { string filterName = 1; int32 limit = 2; int32 offset = 3; }
 message ListScreensResponse { repeated Screen screens = 1; int32 total = 2; }
+message ListUserScreensRequest { string userId = 1; }
+message ListUserScreensResponse {repeated Screen screens = 1; int32 total = 2;}
 
 /* Config requests */
 message CreateConfigRequest {
@@ -78,4 +80,5 @@ service ScreenService {
   rpc CreateConfig(CreateConfigRequest) returns (CreateConfigResponse);
   rpc GetConfig(GetConfigRequest) returns (GetConfigResponse);
   rpc AssignConfigToScreen(AssignConfigRequest) returns (AssignConfigResponse);
+  rpc GetListUserScreens(ListUserScreensRequest) returns (ListUserScreensResponse);
 }

@@ -49,7 +49,7 @@ public class ConfigController : ControllerBase
                     InlineData = it.InlineData ?? "",
                     Checksum = it.Checksum ?? "",
                     Size = it.Size,
-                    DurationSeconds = it.DurationSeconds,
+                    DurationSeconds = 5,
                     Order = it.Order
                 };
                 req.Items.Add(ci);
