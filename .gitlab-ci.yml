@@ -26,7 +26,7 @@ build-adcontrol-auth:
   image: docker:20.10.16
   script:
   - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
-  - docker build -t $IMAGE_REGISTRY/adcontrol-auth:$CI_COMMIT_SHORT_SHA -t $IMAGE_REGISTRY/adcontrol-auth:latest -f src/Server/AdControl.Auth/Dockerfile .
+  - docker build -t $IMAGE_REGISTRY/adcontrol-auth:$CI_COMMIT_SHORT_SHA -t $IMAGE_REGISTRY/adcontrol-auth:latest -f Server/AdControl.Auth/Dockerfile src
   - docker push $IMAGE_REGISTRY/adcontrol-auth:$CI_COMMIT_SHORT_SHA
   - docker push $IMAGE_REGISTRY/adcontrol-auth:latest
   only:
