@@ -39,7 +39,7 @@ build-adcontrol-web:
   script:
     - echo "Logging into GitLab Container Registry..."
     - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
-    - docker build -t $IMAGE_REGISTRY/adcontrol-web:$CI_COMMIT_SHORT_SHA -t $IMAGE_REGISTRY/adcontrol-web:latest -f Server/AdControl.Web/AdControl.Web/Dockerfile Server/AdControl.Web
+    - docker build -t "$IMAGE_REGISTRY/adcontrol-web:$CI_COMMIT_SHORT_SHA" -t "$IMAGE_REGISTRY/adcontrol-web:latest" -f src/Server/AdControl.Web/AdControl.Web/Dockerfile src
     - docker push $IMAGE_REGISTRY/adcontrol-web:$CI_COMMIT_SHORT_SHA
     - docker push $IMAGE_REGISTRY/adcontrol-web:latest
   only:
@@ -51,7 +51,7 @@ build-adcontrol-gateway:
   script:
     - echo "Logging into GitLab Container Registry..."
     - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
-    - docker build -t $IMAGE_REGISTRY/adcontrol-gateway:$CI_COMMIT_SHORT_SHA -t $IMAGE_REGISTRY/adcontrol-gateway:latest -f Server/AdControl.Gateway/AdControl.Gateway/Dockerfile Server/AdControl.Gateway
+    - docker build -t "$IMAGE_REGISTRY/adcontrol-gateway:$CI_COMMIT_SHORT_SHA" -t "$IMAGE_REGISTRY/adcontrol-gateway:latest" -f src/Server/AdControl.Gateway/Dockerfile src
     - docker push $IMAGE_REGISTRY/adcontrol-gateway:$CI_COMMIT_SHORT_SHA
     - docker push $IMAGE_REGISTRY/adcontrol-gateway:latest
   only:
@@ -63,7 +63,7 @@ build-adcontrol-avalonia-logic:
   script:
     - echo "Logging into GitLab Container Registry..."
     - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
-    - docker build -t $IMAGE_REGISTRY/adcontrol-avalonia-logic:$CI_COMMIT_SHORT_SHA -t $IMAGE_REGISTRY/adcontrol-avalonia-logic:latest -f Server/AdControl.Avalonia.Logic/AdControl.Avalonia.Logic/Dockerfile Server/AdControl.Avalonia.Logic
+    - docker build -t "$IMAGE_REGISTRY/adcontrol-avalonia-logic:$CI_COMMIT_SHORT_SHA" -t "$IMAGE_REGISTRY/adcontrol-avalonia-logic:latest" -f src/Server/AdControl.Avalonia.Logic/AdControl.Avalonia.Logic/Dockerfile src
     - docker push $IMAGE_REGISTRY/adcontrol-avalonia-logic:$CI_COMMIT_SHORT_SHA
     - docker push $IMAGE_REGISTRY/adcontrol-avalonia-logic:latest
   only:
