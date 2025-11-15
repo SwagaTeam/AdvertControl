@@ -24,17 +24,11 @@ static void ConfigureKestrel(WebApplicationBuilder builder)
 {
     builder.WebHost.ConfigureKestrel(options =>
     {
-        var port = int.TryParse(Environment.GetEnvironmentVariable("ASPNETCORE_PORT"), out var p) ? p : 5003;
-        var certPath = "/etc/letsencrypt/live/advertcontrol.ru/fullchain.pem";
-        var keyPath = "/etc/letsencrypt/live/advertcontrol.ru/privkey.pem";
-
+        var port = int.TryParse(Environment.GetEnvironmentVariable("ASPNETCORE_PORT"), out var p) ? p : 5001;
+        var certPath = "/etc/letsencrypt/live/advertcontrol.ru/cert.pfx"; // путь к pfx
         options.ListenAnyIP(port, listenOptions =>
         {
-            if (!string.IsNullOrEmpty(certPath) && !string.IsNullOrEmpty(keyPath))
-            {
-                listenOptions.UseHttps(certPath, keyPath); // UseHttps с двумя параметрами
-            }
-
+            listenOptions.UseHttps(certPath, ""); // пароль пустой, если при экспорте оставили пустым
             listenOptions.Protocols = HttpProtocols.Http2;
         });
     });

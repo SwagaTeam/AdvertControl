@@ -61,7 +61,7 @@ services:
       postgres:
         condition: service_healthy
     volumes:
-      - ~/.aspnet/https:/https:ro
+      - /etc/letsencrypt/live/advertcontrol.ru/cert.pfx:/https/cert.pfx:ro
 
   adcontrol-web:
     container_name: adcontrol-web
@@ -82,7 +82,7 @@ services:
       redis:
         condition: service_healthy
     volumes:
-      - ~/.aspnet/https:/https:ro
+      - /etc/letsencrypt/live/advertcontrol.ru/cert.pfx:/https/cert.pfx:ro
 
   adcontrol-avalonia-logic:
     container_name: adcontrol-avalonia-logic
@@ -103,7 +103,7 @@ services:
       adcontrol-web:
         condition: service_started
     volumes:
-      - ~/.aspnet/https:/https:ro
+      - /etc/letsencrypt/live/advertcontrol.ru/cert.pfx:/https/cert.pfx:ro
 
   adcontrol-gateway:
     container_name: adcontrol-gateway
