@@ -95,7 +95,7 @@ services:
       redis:
         condition: service_healthy
     volumes:
-      - /etc/letsencrypt/live/advertcontrol.ru/cert.pfx:/https/cert.pfx:ro
+      - ~/certs/cert.pfx:/https/cert.pfx:ro
     networks:
       - adcontrol-network
 
