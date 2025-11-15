@@ -46,7 +46,7 @@ deploy-job:
   script:
     - git config --global user.name "younggogy"
     - git config --global user.email "younggogy@gmail.com"
-    - git remote set-url origin https://younggogy:$DEPLOY_PAT@gitlab.com/younggogy/advertising-screen-management-system.git
+    - git remote set-url origin https://younggogy:glpat-hklI4j_ngzZgORBgaRRH-G86MQp1Omh3CA.01.0y1uyyona@gitlab.com/younggogy/advertising-screen-management-system.git
     - git push origin main
   only:
     - main
