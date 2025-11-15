@@ -1,7 +1,10 @@
 stages:
-  - build
+  - login
+  - build-backend
+  - build-frontend
   - test
-  - deploy
+  - deploy-backend
+  - deploy-frontend
 
 variables:
   IMAGE_REGISTRY: $CI_REGISTRY_IMAGE
@@ -40,8 +43,8 @@ variables:
 # -----------------------
 # Docker login job (через PAT)
 # -----------------------
-build-login:
-  stage: build
+login:
+  stage: login
   image: docker:20.10.16
   script:
     - echo "$CI_JOB_TOKEN" | docker login -u gitlab-ci-token --password-stdin $CI_REGISTRY
@@ -52,7 +55,7 @@ build-login:
 # Build backend images
 # -----------------------
 build-adcontrol-auth:
-  stage: build
+  stage: build-backend
   image: docker:20.10.16
   script:
     - echo "Logging into GitLab Container Registry..."
@@ -64,7 +67,7 @@ build-adcontrol-auth:
     - main
 
 build-adcontrol-web:
-  stage: build
+  stage: build-backend
   image: docker:20.10.16
   script:
     - echo "Logging into GitLab Container Registry..."
@@ -76,7 +79,7 @@ build-adcontrol-web:
     - main
 
 build-adcontrol-gateway:
-  stage: build
+  stage: build-backend
   image: docker:20.10.16
   script:
     - echo "Logging into GitLab Container Registry..."
@@ -88,7 +91,7 @@ build-adcontrol-gateway:
     - main
 
 build-adcontrol-avalonia-logic:
-  stage: build
+  stage: build-backend
   image: docker:20.10.16
   script:
     - echo "Logging into GitLab Container Registry..."
@@ -99,8 +102,12 @@ build-adcontrol-avalonia-logic:
   only:
     - main
 
+
+# -----------------------
+# Build frontend images
+# -----------------------
 build-frontend:
-  stage: build
+  stage: build-frontend
   image: docker:20.10.16
   script:
     - echo "Logging into GitLab Container Registry..."
@@ -115,7 +122,7 @@ build-frontend:
 # Deploy stage (pull images & run on server)
 # -----------------------
 deploy-backend-job:
-  stage: deploy
+  stage: deploy-backend
   image: alpine:latest
   before_script:
     - apk add --no-cache openssh-client rsync bash
@@ -144,7 +151,7 @@ deploy-backend-job:
   when: on_success
 
 deploy-frontend-job:
-  stage: deploy
+  stage: deploy-frontend
   image: alpine:latest
   before_script:
     - apk add --no-cache openssh-client rsync bash
