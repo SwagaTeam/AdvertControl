@@ -1,17 +1,22 @@
-FROM node:18-alpine
-
-RUN apk add --no-cache bash
-
+# Dockerfile
+FROM node:22.15.0 AS builder
 WORKDIR /app
 
-# Копируем package.json и package-lock.json для npm install
+# Копируем package.json и lock (для кэша)
 COPY package*.json ./
 
-RUN npm install react-loading && npm install
+RUN npm ci --prefer-offline --no-audit --progress=false
 
-# Копируем всё остальное
+# Копируем код
 COPY . .
 
-EXPOSE 5173
+# НЕ запускаем tsc; используем vite напрямую — esbuild transpiles TS without type-check.
+RUN npx vite build
 
-CMD ["npm", "run", "dev", "--", "--host"]
+# Runtime stage (preview)
+FROM node:22.15.0 AS runner
+WORKDIR /app
+RUN npm i -g serve
+COPY --from=builder /app/dist /app/dist
+EXPOSE 3000
+CMD ["serve", "-s", "dist", "-l", "3000"]
