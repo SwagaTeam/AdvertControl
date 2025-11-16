@@ -40,7 +40,8 @@ public class AppDbContext : DbContext
         {
             b.HasKey(x => x.Id);
             b.Property(x => x.Type).HasMaxLength(50);
-            b.Property(x => x.UrlOrData).HasMaxLength(2000);
+            b.Property(x => x.Url).HasMaxLength(500);
+            b.Property(x => x.InlineData).HasMaxLength(5000);
         });
 
         model.Entity<ScreenConfig>(b =>

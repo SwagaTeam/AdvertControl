@@ -1,4 +1,8 @@
-﻿using AdControl.Application.Services.Abstractions;
+﻿using System.Collections.Immutable;
+using System.ComponentModel.DataAnnotations;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using AdControl.Application.Services.Abstractions;
 using AdControl.Protos;
 using Grpc.Core;
 using ConfigItem = AdControl.Domain.Models.ConfigItem;
@@ -23,8 +27,11 @@ public class GrpcScreenService : ScreenService.ScreenServiceBase
     {
         try
         {
-            // TODO AUTH
+            var userIdString = GetUserIdFromMetadata(context);
             Guid? userId = null;
+            if (Guid.TryParse(userIdString, out var g))
+                userId = g;
+            else throw new UnauthorizedAccessException();
             var created = await _screens.CreateAsync(request.Name, request.Resolution, request.Location, userId);
             return new CreateScreenResponse { Id = created.Id.ToString(), Status = "created" };
         }
@@ -37,12 +44,19 @@ public class GrpcScreenService : ScreenService.ScreenServiceBase
 
     public override async Task<GetScreenResponse> GetScreen(GetScreenRequest request, ServerCallContext context)
     {
+        var userIdString = GetUserIdFromMetadata(context);
+        Guid? userId = null;
+        if (Guid.TryParse(userIdString, out var g))
+            userId = g;
+        else throw new UnauthorizedAccessException();
+
         if (!Guid.TryParse(request.Id, out var id))
             return new GetScreenResponse();
 
         var s = await _screens.GetAsync(id);
         if (s == null) return new GetScreenResponse();
-
+        if (s.UserId != userId)
+            throw new UnauthorizedAccessException();
         var proto = new Screen
         {
             Id = s.Id.ToString(),
@@ -56,12 +70,62 @@ public class GrpcScreenService : ScreenService.ScreenServiceBase
             UpdatedAt = DateTimeToUnixMs(s.UpdatedAt)
         };
 
-        return new GetScreenResponse { Screen = proto };
+        var types = s.ScreenConfigs
+            .Select(sc => sc.Config)
+            .SelectMany(c => c.Items)
+            .Select(i => i.Type);
+
+        return new GetScreenResponse { Screen = proto, Type = { types } };
+    }
+
+    public override async Task<ListUserScreensResponse> GetListUserScreens(ListUserScreensRequest request,
+        ServerCallContext context)
+    {
+        var userIdString = GetUserIdFromMetadata(context);
+        Guid? userId = null;
+        if (Guid.TryParse(userIdString, out var g))
+            userId = g;
+        else throw new UnauthorizedAccessException();
+
+        var screenListByUserId = await _screens.GetListByUserIdAsync(Guid.Parse(request.UserId));
+        if (screenListByUserId.Any(s => s.UserId != userId))
+            throw new UnauthorizedAccessException();
+
+        var resp = new ListUserScreensResponse();
+        foreach (var screen in screenListByUserId)
+        {
+            resp.Screens.Add(new Screen
+            {
+                Id = screen.Id.ToString(),
+                UserId = screen.UserId?.ToString() ?? "",
+                Name = screen.Name,
+                Resolution = screen.Resolution,
+                Location = screen.Location,
+                LastHeartbeatAt = screen.LastHeartbeatAt.HasValue ? DateTimeToUnixMs(screen.LastHeartbeatAt.Value) : 0,
+                PairedAt = screen.PairedAt.HasValue ? DateTimeToUnixMs(screen.PairedAt.Value) : 0,
+                CreatedAt = DateTimeToUnixMs(screen.CreatedAt),
+                UpdatedAt = DateTimeToUnixMs(screen.UpdatedAt)
+            });
+        }
+
+        resp.Total = resp.Screens.Count;
+
+        return resp;
     }
 
     public override async Task<ListScreensResponse> ListScreens(ListScreensRequest request, ServerCallContext context)
     {
+        var userIdString = GetUserIdFromMetadata(context);
+        Guid? userId = null;
+        if (Guid.TryParse(userIdString, out var g))
+            userId = g;
+        else throw new UnauthorizedAccessException();
+
         var (items, total) = await _screens.ListAsync(request.FilterName, request.Limit, request.Offset);
+
+        if (items.Any(s => s.UserId != userId))
+            throw new UnauthorizedAccessException();
+
         var resp = new ListScreensResponse();
         foreach (var s in items)
             resp.Screens.Add(new Screen
@@ -85,16 +149,19 @@ public class GrpcScreenService : ScreenService.ScreenServiceBase
     {
         try
         {
-            // TODO AUTH
+            var userIdString = GetUserIdFromMetadata(context);
             Guid? userId = null;
-            if (!string.IsNullOrEmpty(request.UserId) && Guid.TryParse(request.UserId, out var uid)) userId = uid;
+            if (Guid.TryParse(userIdString, out var g))
+                userId = g;
+            else throw new UnauthorizedAccessException();
 
             var items = request.Items.Select(i => new ConfigItem
             {
                 Id = string.IsNullOrEmpty(i.Id) ? Guid.NewGuid() : Guid.Parse(i.Id),
                 ConfigId = Guid.Empty, // will be set in service
                 Type = i.Type.ToString(),
-                UrlOrData = string.IsNullOrEmpty(i.Url) ? i.InlineData ?? "" : i.Url,
+                Url = i.Url,
+                InlineData = i.InlineData,
                 Checksum = i.Checksum,
                 Size = i.Size,
                 DurationSeconds = i.DurationSeconds,
@@ -113,9 +180,19 @@ public class GrpcScreenService : ScreenService.ScreenServiceBase
 
     public override async Task<GetConfigResponse> GetConfig(GetConfigRequest request, ServerCallContext context)
     {
+        var userIdString = GetUserIdFromMetadata(context);
+        Guid? userId = null;
+        if (Guid.TryParse(userIdString, out var g))
+            userId = g;
+        else throw new UnauthorizedAccessException();
+
         if (!Guid.TryParse(request.Id, out var id)) return new GetConfigResponse();
         var cfg = await _configs.GetAsync(id);
         if (cfg == null) return new GetConfigResponse();
+
+
+        if (cfg.UserId != userId)
+            throw new UnauthorizedAccessException();
 
         var proto = new Config
         {
@@ -129,8 +206,8 @@ public class GrpcScreenService : ScreenService.ScreenServiceBase
                 Type = Enum.TryParse<ItemType>(it.Type, true, out var t)
                     ? t
                     : ItemType.Image,
-                Url = it.UrlOrData,
-                InlineData = it.UrlOrData,
+                Url = it.Url,
+                InlineData = it.InlineData,
                 Checksum = it.Checksum ?? "",
                 Size = it.Size,
                 DurationSeconds = it.DurationSeconds,
@@ -139,11 +216,72 @@ public class GrpcScreenService : ScreenService.ScreenServiceBase
         return new GetConfigResponse { Config = proto };
     }
 
+    public override async Task<AddItemsResponse> AddConfigItems(AddItemsRequest request, ServerCallContext context)
+    {
+        var userIdString = GetUserIdFromMetadata(context);
+        Guid? userId = null;
+        if (Guid.TryParse(userIdString, out var g))
+            userId = g;
+        else throw new UnauthorizedAccessException();
+
+        try
+        {
+            if (!Guid.TryParse(request.Id, out var configId)) throw new ValidationException("Wrong config id");
+            var protoItems = request.Items;
+            var items = protoItems.Select(it => new ConfigItem
+                {
+                    Id = string.IsNullOrEmpty(it.Id) ? Guid.NewGuid() : Guid.Parse(it.Id),
+                    ConfigId = Guid.Parse(it.ConfigId),
+                    Type = it.Type.ToString(),
+                    Url = it.Url,
+                    InlineData = it.InlineData,
+                    Checksum = it.Checksum ?? "",
+                    Size = it.Size,
+                    DurationSeconds = it.DurationSeconds,
+                    Order = it.Order
+                })
+                .ToList();
+
+            var cfg = await _configs.AddItems(configId, items, context.CancellationToken);
+            var protoCfg = new Config
+            {
+                Id = cfg.Id.ToString(), UserId = cfg.UserId?.ToString() ?? "",
+                CreatedAt = DateTimeToUnixMs(cfg.CreatedAt), Items = { protoItems }
+            };
+            var response = new AddItemsResponse
+            {
+                Config = protoCfg
+            };
+            return response;
+        }
+        catch (Exception ex)
+        {
+            _log.LogError(ex, "Add items failed");
+            return new AddItemsResponse();
+        }
+    }
+
     public override async Task<AssignConfigResponse> AssignConfigToScreen(AssignConfigRequest request,
         ServerCallContext context)
     {
+        var userIdString = GetUserIdFromMetadata(context);
+        Guid? userId = null;
+        if (Guid.TryParse(userIdString, out var g))
+            userId = g;
+        else throw new UnauthorizedAccessException();
+
         try
         {
+            if (!Guid.TryParse(request.ConfigId, out var configId)) throw new ValidationException("Wrong config id");
+            var cfg = await _configs.GetAsync(configId, context.CancellationToken);
+            if (cfg == null) throw new NullReferenceException("Config does not exist");
+
+            if (!Guid.TryParse(request.ScreenId, out var id)) throw new ValidationException("Wrong screen id");
+            var s = await _screens.GetAsync(id);
+            if (s == null) throw new NullReferenceException("Screen does not exist");
+
+            if (cfg.UserId != userId || s.UserId != userId) throw new UnauthorizedAccessException();
+
             if (!Guid.TryParse(request.ScreenId, out var sid) || !Guid.TryParse(request.ConfigId, out var cid))
                 return new AssignConfigResponse { Error = "invalid ids" };
 
@@ -160,5 +298,25 @@ public class GrpcScreenService : ScreenService.ScreenServiceBase
     private static long DateTimeToUnixMs(DateTime dt)
     {
         return new DateTimeOffset(dt.ToUniversalTime()).ToUnixTimeMilliseconds();
+    }
+
+    private static string? GetUserIdFromMetadata(ServerCallContext context)
+    {
+        var authEntry =
+            context.RequestHeaders.FirstOrDefault(h => h.Key == "authorization" || h.Key == "authorization-bin");
+        if (authEntry == null) return null;
+
+        var auth = authEntry.Value;
+        if (string.IsNullOrEmpty(auth)) return null;
+
+        // "Bearer <token>"
+        var token = auth.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase) ? auth.Substring(7) : auth;
+
+        var handler = new JwtSecurityTokenHandler();
+        if (!handler.CanReadToken(token)) return null;
+        var jwt = handler.ReadJwtToken(token);
+
+        var sub = jwt.Claims.FirstOrDefault(c => c.Type == "sub" || c.Type == ClaimTypes.NameIdentifier)?.Value;
+        return sub;
     }
 }

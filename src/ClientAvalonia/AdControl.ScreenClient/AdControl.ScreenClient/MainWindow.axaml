@@ -1,9 +1,61 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        xmlns:screenClient="clr-namespace:AdControl.ScreenClient"
+        xmlns:vlc="clr-namespace:LibVLCSharp.Avalonia;assembly=LibVLCSharp.Avalonia"
+        x:DataType="screenClient:MainWindow"
         x:Class="AdControl.ScreenClient.MainWindow"
-        Title="AdControl.ScreenClient">
-    Welcome to Avalonia!
+        Title="AdControl Screen Client"
+        WindowState="FullScreen"
+        SystemDecorations="None"
+        Background="Black"
+        WindowStartupLocation="CenterScreen">
+
+    <Grid>
+        <!-- Видео -->
+        <vlc:VideoView x:Name="VideoViewControl"
+                       HorizontalAlignment="Stretch"
+                       VerticalAlignment="Stretch"
+                       IsVisible="False" />
+
+        <!-- Изображение -->
+        <Image x:Name="ImageControl"
+               HorizontalAlignment="Stretch"
+               VerticalAlignment="Stretch"
+               Stretch="UniformToFill"
+               IsVisible="True" />
+
+        <!-- Таблица -->
+        <DataGrid x:Name="JsonTable"
+                  Margin="20"
+                  IsReadOnly="True"
+                  GridLinesVisibility="None"
+                  BorderThickness="0"
+                  AutoGenerateColumns="False"
+                  RowHeight="50"
+                  FontSize="20"
+                  FontFamily="Segoe UI"
+                  ColumnWidth="*"
+                  HeadersVisibility="Column"
+                  Background="#F5F7FA"
+                  IsVisible="False" />
+
+        <!-- Статус и код -->
+        <StackPanel VerticalAlignment="Top"
+                    HorizontalAlignment="Center"
+                    Margin="0,40,0,0"
+                    Spacing="12">
+            <TextBlock x:Name="StatusText"
+                       FontSize="20"
+                       FontWeight="SemiBold"
+                       Foreground="White"
+                       TextAlignment="Center"/>
+            <TextBlock x:Name="PairCodeText"
+                       Text="Здесь будет код"
+                       Classes="code-display"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"
+                       TextAlignment="Center"/>
+
+        </StackPanel>
+    </Grid>
 </Window>

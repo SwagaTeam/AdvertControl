@@ -1,18 +1,27 @@
 ﻿namespace AdControl.Gateway.Application.Dtos;
 
+/// <summary>
+///     DTO для старта привязки экрана.
+/// </summary>
 public class StartPairDto
 {
-    public int TtlMinutes;
+    /// <summary>
+    ///     Временный идентификатор экрана.
+    /// </summary>
+    public string TempDisplayId { get; set; } = default!;
 
-    public StartPairDto(string tempDisplayId, string code, string? info, int ttlMinutes = 10)
-    {
-        TtlMinutes = ttlMinutes;
-        TempDisplayId = tempDisplayId;
-        Code = code;
-        Info = info;
-    }
+    /// <summary>
+    ///     Код привязки.
+    /// </summary>
+    public string Code { get; set; } = default!;
 
-    public string TempDisplayId { get; set; }
-    public string Code { get; set; }
+    /// <summary>
+    ///     Время жизни кода в минутах.
+    /// </summary>
+    public int TtlMinutes { get; set; } = 10;
+
+    /// <summary>
+    ///     Дополнительная информация о экране.
+    /// </summary>
     public string? Info { get; set; }
 }

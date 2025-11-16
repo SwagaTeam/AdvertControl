@@ -1,24 +1,27 @@
+using System;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
+using LibVLCSharp.Shared;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace AdControl.ScreenClient
+namespace AdControl.ScreenClient;
+
+public partial class App : Application
 {
-    public partial class App : Application
+    public static IServiceProvider? Services { get; set; }
+
+    public override void Initialize()
     {
-        public override void Initialize()
-        {
-            AvaloniaXamlLoader.Load(this);
-        }
+        Core.Initialize();
+        AvaloniaXamlLoader.Load(this);
+    }
 
-        public override void OnFrameworkInitializationCompleted()
-        {
-            if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
-            {
-                desktop.MainWindow = new MainWindow();
-            }
+    public override void OnFrameworkInitializationCompleted()
+    {
+        if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+            desktop.MainWindow = Services?.GetService<MainWindow>() ?? new MainWindow();
 
-            base.OnFrameworkInitializationCompleted();
-        }
+        base.OnFrameworkInitializationCompleted();
     }
 }

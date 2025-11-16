@@ -35,4 +35,18 @@ public class ConfigService : IConfigService
     {
         await _repo.AssignToScreenAsync(screenId, configId, isActive, ct);
     }
+
+    public async Task<Config?> GetConfigForScreenAsync(Guid screenId, CancellationToken ct = default)
+    {
+        var cfg = await _repo.GetConfigForScreenAsync(screenId, ct);
+
+        return cfg;
+    }
+
+    public async Task<Config?> AddItems(Guid configId, List<ConfigItem> items, CancellationToken ct = default)
+    {
+        var cfg = await GetAsync(configId, ct);
+        if (cfg is null) throw new NullReferenceException("Config not found");
+        return await _repo.AddItems(configId, items, ct);
+    }
 }

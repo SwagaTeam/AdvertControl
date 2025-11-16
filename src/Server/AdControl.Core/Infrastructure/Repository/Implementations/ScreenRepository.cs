@@ -16,7 +16,8 @@ public class ScreenRepository : IScreenRepository
 
     public async Task<Screen?> GetAsync(Guid id, CancellationToken ct = default)
     {
-        return await _db.Screens.Include(s => s.ScreenConfigs).FirstOrDefaultAsync(x => x.Id == id, ct);
+        return await _db.Screens.Include(s => s.ScreenConfigs).ThenInclude(sc => sc.Config).ThenInclude(c => c.Items)
+            .FirstOrDefaultAsync(x => x.Id == id, ct);
     }
 
     public async Task<List<Screen>> ListAsync(string? filterName, int limit, int offset, CancellationToken ct = default)
@@ -38,4 +39,18 @@ public class ScreenRepository : IScreenRepository
         _db.Screens.Update(screen);
         await _db.SaveChangesAsync(ct);
     }
+
+    public async Task UpdateLastHeartBeatAsync(Guid screenId, CancellationToken ct = default)
+    {
+        var screen = await _db.Screens.FirstOrDefaultAsync(x => x.Id == screenId, ct);
+        if (screen is not null)
+            screen.LastHeartbeatAt = DateTime.UtcNow;
+    }
+
+    public async Task<IQueryable<Screen>> GetListByUserIdAsync(Guid userId, CancellationToken ct = default)
+    {
+        var screens = _db.Screens.Where(x=>x.UserId == userId);
+        return screens;
+    }
+
 }

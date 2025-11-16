@@ -1,20 +1,32 @@
 ﻿namespace AdControl.Gateway.Application.Dtos;
 
+/// <summary>
+///     DTO для подтверждения привязки экрана.
+/// </summary>
 public class ConfirmPairDto
 {
-    public int AssignedTtlMinutes;
+    /// <summary>
+    ///     Код привязки.
+    /// </summary>
+    public string Code { get; set; } = null!;
 
-    public ConfirmPairDto(string code, string? name, string? location, string? resolution, int assignedTtlMinutes = 60)
-    {
-        AssignedTtlMinutes = assignedTtlMinutes;
-        Code = code;
-        Name = name;
-        Location = location;
-        Resolution = resolution;
-    }
-
-    public string Code { get; set; }
+    /// <summary>
+    ///     Имя экрана (опционально).
+    /// </summary>
     public string? Name { get; set; }
-    public string? Location { get; set; }
+
+    /// <summary>
+    ///     Разрешение экрана (опционально).
+    /// </summary>
     public string? Resolution { get; set; }
+
+    /// <summary>
+    ///     Местоположение экрана (опционально).
+    /// </summary>
+    public string? Location { get; set; }
+
+    /// <summary>
+    ///     Время жизни назначения в минутах.
+    /// </summary>
+    public int AssignedTtlMinutes { get; set; }
 }
