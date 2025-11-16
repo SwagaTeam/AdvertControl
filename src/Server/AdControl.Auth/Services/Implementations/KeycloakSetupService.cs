@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.Diagnostics;
+using System.Net;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
@@ -26,6 +27,8 @@ public class KeycloakSetupService : IKeycloakSetupService
         _defaultClientId = "app-client"; // клиент для всех пользователей
         _keycloakBaseUrl =
             o.BaseUrl ?? Environment.GetEnvironmentVariable("KEYCLOAK_BASEURL") ?? "http://keycloak:8080";
+
+        Trace.WriteLine($"BaseUrl : {_keycloakBaseUrl}\nDefaultRealm : {_defaultRealm}\n");
     }
 
     public async Task<string?> GetCurrentUserIdAsync(string token)
