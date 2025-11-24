@@ -21,8 +21,8 @@ public class KeycloakSetupService : IKeycloakSetupService
         _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
         var o = options.Value;
 
-        _defaultAdminUsername = o.AdminUser ?? "zxc";
-        _defaultAdminPassword = o.AdminPassword ?? "zxc";
+        _defaultAdminUsername = o.AdminUser ?? "admin";
+        _defaultAdminPassword = o.AdminPassword ?? "qwerty";
         _defaultRealm = Environment.GetEnvironmentVariable("KEYCLOAK_REALM") ?? "myrealm";
         _defaultClientId = "app-client"; // клиент для всех пользователей
         _keycloakBaseUrl =
