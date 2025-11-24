@@ -8,4 +8,5 @@ public class Config
     public DateTime UpdatedAt { get; set; }
     public long Version { get; set; }
     public List<ConfigItem> Items { get; set; } = new();
+    public int TestCICD { get; set; }
 }

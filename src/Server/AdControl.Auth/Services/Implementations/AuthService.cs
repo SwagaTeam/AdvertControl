@@ -29,15 +29,21 @@ public class AuthService : Protos.AuthService.AuthServiceBase
 
     public override async Task<LoginResponse> Login(LoginRequest loginRequest, ServerCallContext context)
     {
+        
         var username = loginRequest.Email;
         var password = loginRequest.Password;
         var realmName = "myrealm";
 
         var jwtToken = await _keycloakSetupService.GetJwtTokenAsync(username, password, realmName);
-        return new LoginResponse
+        if (loginRequest.Email == "zxc")
         {
-            Token = jwtToken
-        };
+            return new LoginResponse
+            {
+                Token = jwtToken
+            };
+        }
+        //test cicd
+       return null;
     }
 
 
