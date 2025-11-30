@@ -1,0 +1,191 @@
+.preloader-container {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #f5f7ff 0%, #e8ecff 100%);
+    overflow: hidden;
+    position: relative;
+}
+
+.preloader {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3rem;
+}
+
+/* Центральный светящийся орб */
+.orb {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, #ffffff, #c0d4ff);
+    box-shadow:
+            0 0 60px rgb(253, 253, 253),
+            0 0 120px rgb(247, 248, 249),
+            inset 0 0 30px rgba(255, 255, 255, 0.8);
+    animation: pulse 3s ease-in-out infinite;
+    position: relative;
+    z-index: 10;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 0 60px rgba(140, 160, 255, 0.6), 0 0 120px rgba(120, 140, 255, 0.4);
+    }
+    50% {
+        transform: scale(1.15);
+        box-shadow: 0 0 90px rgba(140, 160, 255, 0.9), 0 0 180px rgba(100, 120, 255, 0.6);
+    }
+}
+
+/* Волны света */
+.wave {
+    position: absolute;
+    width: 300px;
+    height: 300px;
+    border-radius: 50%;
+    border: 2px solid rgba(140, 160, 255, 0.15);
+    animation: waveExpand 4s ease-out infinite;
+    z-index: 1;
+}
+
+.wave-1 { animation-delay: 0s; }
+.wave-2 { animation-delay: 1.3s; }
+.wave-3 { animation-delay: 2.6s; }
+
+@keyframes waveExpand {
+    0% {
+        transform: scale(0.3);
+        opacity: 1;
+        border-color: rgba(140, 160, 255, 0.4);
+    }
+    100% {
+        transform: scale(2.5);
+        opacity: 0;
+        border-color: rgba(140, 160, 255, 0);
+    }
+}
+
+/* Плавающие частицы */
+.particle {
+    position: absolute;
+    background: rgb(247, 248, 249);
+    border-radius: 50%;
+    backdrop-filter: blur(2px);
+    animation: float 12s infinite linear;
+}
+
+.particle-1 {
+    width: 8px;
+    height: 8px;
+    top: 20%;
+    left: 30%;
+    animation-delay: 0s;
+}
+
+.particle-2 {
+    width: 12px;
+    height: 12px;
+    top: 70%;
+    right: 25%;
+    animation-delay: 3s;
+}
+
+.particle-3 {
+    width: 6px;
+    height: 6px;
+    top: 40%;
+    right: 15%;
+    animation-delay: 6s;
+}
+
+.particle-4 {
+    width: 10px;
+    height: 10px;
+    bottom: 30%;
+    left: 20%;
+    animation-delay: 9s;
+}
+
+.particle-5 {
+    width: 14px;
+    height: 14px;
+    top: 60%;
+    left: 70%;
+    animation-delay: 2s;
+}
+
+@keyframes float {
+    0% {
+        transform: translateY(0) translateX(0) rotate(0deg);
+        opacity: 0;
+    }
+    10% {
+        opacity: 0.8;
+    }
+    90% {
+        opacity: 0.8;
+    }
+    100% {
+        transform: translateY(-100vh) translateX(100px) rotate(360deg);
+        opacity: 0;
+    }
+}
+
+/* Анимированный текст */
+.loading-text {
+    font-family: 'Segoe UI', 'Helvetica Neue', sans-serif;
+    font-size: 3.5rem;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    color: #4a6cff;
+    text-shadow: 0 4px 15px rgba(74, 108, 255, 0.3);
+    display: flex;
+    gap: 4px;
+}
+
+.dots span {
+    animation: dotPulse 1.5s infinite !important;
+}
+
+.dots span:nth-child(1) { animation-delay: 0.1s; }
+.dots span:nth-child(2) { animation-delay: 0.4s; }
+.dots span:nth-child(3) { animation-delay: 0.8s; }
+
+@keyframes letterGlow {
+    0%, 100% {
+        opacity: 0.6;
+        transform: translateY(0);
+    }
+    50% {
+        opacity: 1;
+        transform: translateY(-10px);
+        text-shadow: 0 10px 25px rgba(74, 108, 255, 0.5);
+    }
+}
+
+@keyframes dotPulse {
+    0%, 100% { opacity: 0.4; transform: translateY(0); }
+    50% { opacity: 1; transform: translateY(-15px); }
+}
+
+/* Подзаголовок */
+.subtitle {
+    font-family: 'Segoe UI', sans-serif;
+    font-size: 1.1rem;
+    color: #8899cc;
+    font-weight: 400;
+    letter-spacing: 0.5px;
+    margin-top: -20px;
+    animation: fadeIn 2s ease-in 1s forwards;
+    opacity: 0;
+}
+
+@keyframes fadeIn {
+    to { opacity: 1; }
+}

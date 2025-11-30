@@ -34,6 +34,7 @@ export function Sidebar({ collapsed, onToggleCollapse }: SidebarProps) {
 
               return (
                   <Link
+                      key={item.path}
                       to={item.path}
                       className="block"
                   >

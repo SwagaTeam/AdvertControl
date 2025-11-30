@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { Plus, Search, Filter } from "lucide-react";
-import { Button } from "./ui/button";
-import { Input } from "./ui/input";
-import { Card } from "./ui/card";
+import { Button } from "../ui/button.tsx";
+import { Input } from "../ui/input.tsx";
+import { Card } from "../ui/card.tsx";
 import {
   Table,
   TableBody,
@@ -10,29 +10,20 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "./ui/table";
-import { Badge } from "./ui/badge";
+} from "../ui/table.tsx";
+import { Badge } from "../ui/badge.tsx";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "./ui/select";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "./ui/dialog";
-import { Label } from "./ui/label";
-
+} from "../ui/select.tsx";
 import { useDispatch, useSelector } from "react-redux";
-import type { RootState, AppDispatch } from "../store/store";
-import { fetchScreens, setPagination } from "../store/screenSlice"; // ✅ исправлено имя
+import type { RootState, AppDispatch } from "../../store/store.ts";
+import { fetchScreens, setPagination, createScreen, resetCreateStatus } from "../../store/screenSlice.ts";
+import { Pagination } from "./Pagination.tsx";
+import { CreateScreenForm } from "./CreateScreenForm.tsx";
 
 export function ScreensPage() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -40,13 +31,28 @@ export function ScreensPage() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const dispatch = useDispatch<AppDispatch>();
-  const { items, total, limit, offset, status } = useSelector(
-      (state: RootState) => state.screens
-  );
+  const {
+    items,
+    total,
+    limit,
+    offset,
+    status,
+    createStatus,
+    createError
+  } = useSelector((state: RootState) => state.screens);
 
   useEffect(() => {
     dispatch(fetchScreens({ limit, offset }));
   }, [dispatch, limit, offset]);
+
+  // Обработка успешного создания экрана
+  useEffect(() => {
+    if (createStatus === "succeeded") {
+      setIsDialogOpen(false);
+      // Можно добавить уведомление об успехе
+      console.log("Экран успешно создан");
+    }
+  }, [createStatus]);
 
   const handleNextPage = () => {
     if (offset + limit < total) {
@@ -57,6 +63,22 @@ export function ScreensPage() {
   const handlePrevPage = () => {
     if (offset - limit >= 0) {
       dispatch(setPagination({ limit, offset: offset - limit }));
+    }
+  };
+
+  const handleCreateScreen = (screenData: {
+    name: string;
+    resolution: string;
+    location: string;
+  }) => {
+    dispatch(createScreen(screenData));
+  };
+
+  const handleDialogOpenChange = (open: boolean) => {
+    setIsDialogOpen(open);
+    if (!open) {
+      // Сбрасываем статус создания при закрытии диалога
+      dispatch(resetCreateStatus());
     }
   };
 
@@ -92,48 +114,14 @@ export function ScreensPage() {
             <p className="text-gray-600 mt-1">Управляйте своей сетью экранов</p>
           </div>
 
-          {/* Диалог добавления экрана */}
-          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            <DialogTrigger asChild>
-              <Button style={{ backgroundColor: "#2563EB" }} className="gap-2">
-                <Plus className="h-4 w-4" />
-                Добавить экран
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Добавить новый экран</DialogTitle>
-                <DialogDescription>
-                  Создайте новый рекламный экран в своей сети.
-                </DialogDescription>
-              </DialogHeader>
-              <div className="space-y-4 py-4">
-                <div className="space-y-2">
-                  <Label htmlFor="screen-name">Название</Label>
-                  <Input id="screen-name" placeholder="" />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="screen-id">Разрешение</Label>
-                  <Input id="screen-id" placeholder="" />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="location">Расположение</Label>
-                  <Input id="location" placeholder="" />
-                </div>
-              </div>
-              <DialogFooter>
-                <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
-                  Отменить
-                </Button>
-                <Button
-                    style={{ backgroundColor: "#2563EB" }}
-                    onClick={() => setIsDialogOpen(false)}
-                >
-                  Добавить экран
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
+          <Button
+              style={{ backgroundColor: "#2563EB" }}
+              className="gap-2"
+              onClick={() => setIsDialogOpen(true)}
+          >
+            <Plus className="h-4 w-4" />
+            Добавить экран
+          </Button>
         </div>
 
         {/* Таблица экранов */}
@@ -201,28 +189,22 @@ export function ScreensPage() {
             )}
           </div>
 
-          {/* Пагинация */}
-          <div className="flex justify-between items-center p-2 border-t border-gray-200">
-            <Button
-                variant="outline"
-                onClick={handlePrevPage}
-                disabled={offset === 0}
-            >
-              Назад
-            </Button>
-            <p className="text-gray-600">
-              Страница {Math.floor(offset / limit) + 1} из{" "}
-              {Math.ceil(total / limit) || 1}
-            </p>
-            <Button
-                variant="outline"
-                onClick={handleNextPage}
-                disabled={offset + limit >= total}
-            >
-              Вперёд
-            </Button>
-          </div>
+          <Pagination
+              offset={offset}
+              limit={limit}
+              total={total}
+              onNextPage={handleNextPage}
+              onPrevPage={handlePrevPage}
+          />
         </Card>
+
+        <CreateScreenForm
+            isOpen={isDialogOpen}
+            onOpenChange={handleDialogOpenChange}
+            onSubmit={handleCreateScreen}
+            isSubmitting={createStatus === "loading"}
+            error={createError}
+        />
       </div>
   );
 }

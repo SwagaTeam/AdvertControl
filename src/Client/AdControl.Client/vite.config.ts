@@ -1,4 +1,5 @@
 /// <reference types="node" />
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { defineConfig, loadEnv } from 'vite';
 import react from '@vitejs/plugin-react';
 import { env } from 'process';

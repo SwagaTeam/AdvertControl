@@ -12,7 +12,7 @@ import {
 } from "./ui/dropdown-menu";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchProfile } from "../features/profile/profileSlice";
+import { fetchProfile } from "../store/profileSlice.ts";
 import { logoutUser } from "../store/authSlice";
 import { useNavigate } from "react-router-dom";
 

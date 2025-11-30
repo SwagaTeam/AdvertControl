@@ -12,7 +12,13 @@ export interface Screen {
     pairedAt: number;
     createdAt: number;
     updatedAt: number;
-    status?: "connected" | "pending" | "error"; // на случай будущих статусов
+    status?: "connected" | "pending" | "error";
+}
+
+interface CreateScreenData {
+    name: string;
+    resolution: string;
+    location: string;
 }
 
 interface ScreensState {
@@ -22,6 +28,8 @@ interface ScreensState {
     error: string | null;
     limit: number;
     offset: number;
+    createStatus: "idle" | "loading" | "succeeded" | "failed";
+    createError: string | null;
 }
 
 const initialState: ScreensState = {
@@ -31,6 +39,8 @@ const initialState: ScreensState = {
     error: null,
     limit: 20,
     offset: 0,
+    createStatus: "idle",
+    createError: null,
 };
 
 export const fetchScreens = createAsyncThunk(
@@ -59,6 +69,25 @@ export const fetchScreens = createAsyncThunk(
     }
 );
 
+export const createScreen = createAsyncThunk(
+    "screens/createScreen",
+    async (screenData: CreateScreenData, { getState, rejectWithValue }) => {
+        const state = getState() as RootState;
+        const token = state.auth.token;
+
+        if (!token) return rejectWithValue("Нет токена авторизации");
+
+        try {
+            const response = await apiClient.post("/screen", screenData);
+            return response.data;
+        } catch (error: any) {
+            return rejectWithValue(
+                error.response?.data?.message || "Ошибка при создании экрана"
+            );
+        }
+    }
+);
+
 const screensSlice = createSlice({
     name: "screens",
     initialState,
@@ -77,9 +106,14 @@ const screensSlice = createSlice({
             state.status = "idle";
             state.offset = 0;
         },
+        resetCreateStatus: (state) => {
+            state.createStatus = "idle";
+            state.createError = null;
+        },
     },
     extraReducers: (builder) => {
         builder
+            // Fetch screens
             .addCase(fetchScreens.pending, (state) => {
                 state.status = "loading";
                 state.error = null;
@@ -92,9 +126,24 @@ const screensSlice = createSlice({
             .addCase(fetchScreens.rejected, (state, action) => {
                 state.status = "failed";
                 state.error = action.payload as string;
+            })
+            // Create screen
+            .addCase(createScreen.pending, (state) => {
+                state.createStatus = "loading";
+                state.createError = null;
+            })
+            .addCase(createScreen.fulfilled, (state, action) => {
+                state.createStatus = "succeeded";
+                // Добавляем новый экран в начало списка
+                state.items.unshift(action.payload);
+                state.total += 1;
+            })
+            .addCase(createScreen.rejected, (state, action) => {
+                state.createStatus = "failed";
+                state.createError = action.payload as string;
             });
     },
 });
 
-export const { addScreen, setPagination, clearScreens } = screensSlice.actions;
+export const { addScreen, setPagination, clearScreens, resetCreateStatus } = screensSlice.actions;
 export default screensSlice.reducer;

@@ -1,38 +1,43 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { DashboardPage } from "./components/DashboardPage";
-import { ScreensPage } from "./components/ScreensPage";
+import { ScreensPage } from "./components/ScreensPage/ScreensPage.tsx";
 import { ConfigurationsPage } from "./components/ConfigurationsPage";
 import { TemplatesPage } from "./components/TemplatesPage";
 import { LoginPage } from "./components/loginPage/LoginPage.tsx";
 import { MainLayout } from "./components/layouts/MainLayout";
-import { AuthGuard } from "./components/AuthGuard";
-import UnauthorizedPage from "./components/UnauthorizedPage";
+import { ProtectedRoute } from "./components/ProtectedRoute";
+import { UnauthorizedPage } from "./components/UnauthorizedPage";
+import { ConfigEditor } from "./components/configEditor/ConfigEditor.tsx";
+import {ProfileScreen} from "./components/ProfileScreen.tsx";
 
 export default function App() {
     return (
         <Router>
             <Routes>
+                {/* Публичные роуты */}
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/unauthorized" element={<UnauthorizedPage />} />
 
+                {/* Защищённые роуты */}
                 <Route
-                    path="/*"
+                    path="/"
                     element={
-                        <AuthGuard>
-                            <MainLayout>
-                                <Routes>
-                                    <Route path="/" element={<DashboardPage />} />
-                                    <Route path="/dashboard" element={<DashboardPage />} />
-                                    <Route path="/screens" element={<ScreensPage />} />
-                                    <Route path="/configurations" element={<ConfigurationsPage />} />
-                                    <Route path="/templates" element={<TemplatesPage />} />
-                                </Routes>
-                            </MainLayout>
-                        </AuthGuard>
+                        <ProtectedRoute>
+                            <MainLayout />
+                        </ProtectedRoute>
                     }
-                />
+                >
+                    <Route index element={<DashboardPage />} />
+                    <Route path="dashboard" element={<DashboardPage />} />
+                    <Route path="screens" element={<ScreensPage />} />
+                    <Route path="configurations" element={<ConfigurationsPage />} />
+                    <Route path="templates" element={<TemplatesPage />} />
+                    <Route path="config-edit" element={<ConfigEditor />} />
+                    <Route path="profile" element={<ProfileScreen />} />
+                </Route>
 
-                <Route path="*" element={<Navigate to="/" />} />
+                {/* Любой неизвестный путь */}
+                <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
         </Router>
     );

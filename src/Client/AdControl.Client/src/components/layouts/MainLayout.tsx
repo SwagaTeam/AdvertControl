@@ -1,12 +1,10 @@
-import React, { type ReactNode, useState } from "react";
+import {useState } from "react";
 import { Header } from "../Header";
 import { Sidebar } from "../Sidebar";
+import {Outlet} from "react-router-dom";
 
-interface MainLayoutProps {
-    children: ReactNode;
-}
 
-export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
+export const MainLayout = () => {
     const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
     return (
@@ -22,7 +20,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                     marginLeft: sidebarCollapsed ? "4rem" : "16rem",
                 }}
             >
-                <div className="p-8">{children}</div>
+                <div className="p-8"><Outlet /></div>
             </main>
         </div>
     );

@@ -1,6 +1,6 @@
 import { configureStore } from "@reduxjs/toolkit";
 import authReducer from "./authSlice";
-import profileReducer from "../features/profile/profileSlice";
+import profileReducer from "./profileSlice.ts";
 import screensReducer from "./screenSlice";
 
 export const store = configureStore({
