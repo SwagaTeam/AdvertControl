@@ -1,6 +1,10 @@
 include:
   - docker-compose.keycloak.yml
 
+networks:
+  adcontrol-network:
+    driver: bridge
+
 services:
   postgres:
     container_name: postgres
