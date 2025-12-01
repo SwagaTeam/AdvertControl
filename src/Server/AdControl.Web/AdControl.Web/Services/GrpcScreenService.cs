@@ -216,6 +216,52 @@ public class GrpcScreenService : ScreenService.ScreenServiceBase
         return new GetConfigResponse { Config = proto };
     }
 
+    public override async Task<GetConfigsResponse> GetConfigs(GetConfigsRequest request, ServerCallContext context)
+    {
+        var userIdString = GetUserIdFromMetadata(context);
+        if (!Guid.TryParse(userIdString, out var userId))
+            throw new UnauthorizedAccessException();
+
+        var configs = await _configs.GetUserConfigs(userId);
+        var response = new GetConfigsResponse();
+
+        if (configs == null)
+            return response;
+
+        foreach (var cfg in configs)
+        {
+            var proto = new Config
+            {
+                Id = cfg.Id.ToString(),
+                UserId = cfg.UserId?.ToString() ?? "",
+                CreatedAt = DateTimeToUnixMs(cfg.CreatedAt),
+                Version = cfg.Version
+            };
+
+            foreach (var it in cfg.Items)
+            {
+                proto.Items.Add(new Protos.ConfigItem
+                {
+                    Id = it.Id.ToString(),
+                    ConfigId = it.ConfigId.ToString(),
+                    Type = Enum.TryParse<ItemType>(it.Type, true, out var t)
+                        ? t
+                        : ItemType.Image,
+                    Url = it.Url,
+                    InlineData = it.InlineData,
+                    Checksum = it.Checksum ?? "",
+                    Size = it.Size,
+                    DurationSeconds = it.DurationSeconds,
+                    Order = it.Order
+                });
+            }
+
+            response.Configs.Add(proto);
+        }
+
+        return response;
+    }
+
     public override async Task<AddItemsResponse> AddConfigItems(AddItemsRequest request, ServerCallContext context)
     {
         var userIdString = GetUserIdFromMetadata(context);
