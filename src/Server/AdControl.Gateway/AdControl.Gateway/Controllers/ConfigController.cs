@@ -136,7 +136,7 @@ public class ConfigController : ControllerBase
             Id = id,
             Items = { items }
         };
-        var response = await _screenClient.AddConfigItemsAsync(request);
+        var response = await _screenClient.AddConfigItemsAsync(request, BuildAuthMetadata(HttpContext));
         return Ok(response);
     }
     
