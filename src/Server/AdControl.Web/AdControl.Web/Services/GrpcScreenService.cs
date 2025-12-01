@@ -5,6 +5,7 @@ using System.Security.Claims;
 using AdControl.Application.Services.Abstractions;
 using AdControl.Protos;
 using Grpc.Core;
+using Minio.Exceptions;
 using ConfigItem = AdControl.Domain.Models.ConfigItem;
 
 namespace AdControl.Web.Services;
@@ -168,7 +169,7 @@ public class GrpcScreenService : ScreenService.ScreenServiceBase
                 Order = i.Order
             }).ToList();
 
-            var cfg = await _configs.CreateAsync(userId, items);
+            var cfg = await _configs.CreateAsync(request.Name, userId, items);
             return new CreateConfigResponse { Id = cfg.Id.ToString(), Status = "created" };
         }
         catch (Exception ex)
@@ -214,6 +215,131 @@ public class GrpcScreenService : ScreenService.ScreenServiceBase
                 Order = it.Order
             });
         return new GetConfigResponse { Config = proto };
+    }
+
+    public override async Task<GetConfigsResponse> GetConfigs(GetConfigsRequest request, ServerCallContext context)
+    {
+        var userIdString = GetUserIdFromMetadata(context);
+        if (!Guid.TryParse(userIdString, out var userId))
+            throw new UnauthorizedAccessException();
+
+        var configs = await _configs.GetUserConfigs(userId);
+        var response = new GetConfigsResponse();
+
+        if (configs == null)
+            return response;
+
+        foreach (var cfg in configs)
+        {
+            var proto = new Config
+            {
+                Id = cfg.Id.ToString(),
+                UserId = cfg.UserId?.ToString() ?? "",
+                CreatedAt = DateTimeToUnixMs(cfg.CreatedAt),
+                Version = cfg.Version
+            };
+
+            foreach (var it in cfg.Items)
+            {
+                proto.Items.Add(new Protos.ConfigItem
+                {
+                    Id = it.Id.ToString(),
+                    ConfigId = it.ConfigId.ToString(),
+                    Type = Enum.TryParse<ItemType>(it.Type, true, out var t)
+                        ? t
+                        : ItemType.Image,
+                    Url = it.Url,
+                    InlineData = it.InlineData,
+                    Checksum = it.Checksum ?? "",
+                    Size = it.Size,
+                    DurationSeconds = it.DurationSeconds,
+                    Order = it.Order
+                });
+            }
+
+            response.Configs.Add(proto);
+        }
+
+        return response;
+    }
+
+    public override async Task<UpdateScreenFieldsResponse> UpdateScreenFields(UpdateScreenFieldsRequest request,
+        ServerCallContext context)
+    {
+        var userIdString = GetUserIdFromMetadata(context);
+        Guid? userId = null;
+        if (Guid.TryParse(userIdString, out var g))
+            userId = g;
+        else throw new UnauthorizedAccessException();
+        try
+        {
+            var guidId = Guid.Parse(request.Id);
+            var screen = await _screens.GetAsync(guidId);
+            if (screen == null) throw new ArgumentException("screen not found");
+            
+            var name = request.Name;
+            var resolution = request.Resolution;
+            var location = request.Location;
+            if (name is not null && !string.IsNullOrEmpty(name))
+            {
+                screen.Name = name;
+            }
+            if (resolution is not null && !string.IsNullOrEmpty(resolution))
+            {
+                screen.Resolution = resolution;
+            }
+            if (location is not null && !string.IsNullOrEmpty(location))
+            {
+                screen.Location = location;
+            }
+            var newScreen = await _screens.UpdateAsync(screen);
+            return new UpdateScreenFieldsResponse
+            {
+                Screen = new Screen
+                {
+                    Id = newScreen.Id.ToString(),
+                    UserId = newScreen.UserId?.ToString() ?? "",
+                    Name = newScreen.Name,
+                    Resolution = newScreen.Resolution,
+                    Location = newScreen.Location,
+                    LastHeartbeatAt = newScreen.LastHeartbeatAt.HasValue ? DateTimeToUnixMs(newScreen.LastHeartbeatAt.Value) : 0,
+                    PairedAt = newScreen.PairedAt.HasValue ? DateTimeToUnixMs(newScreen.PairedAt.Value) : 0,
+                    CreatedAt = DateTimeToUnixMs(newScreen.CreatedAt),
+                    UpdatedAt = DateTimeToUnixMs(newScreen.UpdatedAt)
+                },
+            };
+        }
+        
+        catch (Exception ex)
+        {
+            _log.LogError(ex, "UpdateScreenFields failed");
+            return new UpdateScreenFieldsResponse();
+        }
+    }
+
+    public override async Task<RemoveItemResponse> RemoveConfigItem(RemoveItemRequest request, ServerCallContext context)
+    {
+        var userIdString = GetUserIdFromMetadata(context);
+        Guid? userId = null;
+        if (Guid.TryParse(userIdString, out var g))
+            userId = g;
+        else throw new UnauthorizedAccessException();
+
+        try
+        {
+            var guidId = Guid.Parse(request.Id);
+            var guidItemId = Guid.Parse(request.ItemId);
+            var deleted = await _configs.DeleteConfigItemAsync(guidId, guidItemId);
+            return new RemoveItemResponse
+            {
+                Success = deleted,
+            };
+        }
+        catch (Exception ex)
+        {
+            _log.LogError(ex, "RemoveConfigItem failed");
+            return new RemoveItemResponse();
+        }
     }
 
     public override async Task<AddItemsResponse> AddConfigItems(AddItemsRequest request, ServerCallContext context)

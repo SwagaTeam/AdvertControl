@@ -47,6 +47,13 @@ public class ConfigRepository : IConfigRepository
             .FirstOrDefault();
     }
 
+    public async Task<IEnumerable<Config?>> GetUserConfigs(Guid userId, CancellationToken ct = default)
+    {
+        var configs = _db.Configs.Where(config => config.UserId == userId);
+
+        return configs;
+    }
+
     public async Task<Config> CreateAsync(Config cfg, CancellationToken ct = default)
     {
         _db.Configs.Add(cfg);
@@ -73,5 +80,25 @@ public class ConfigRepository : IConfigRepository
         _db.ConfigItems.AddRange(items);
         await _db.SaveChangesAsync(ct);
         return await GetAsync(configId, ct);
+    }
+    
+    public async Task<Config> UpdateAsync(Config config, CancellationToken ct = default)
+    {
+        config.UpdatedAt = DateTime.UtcNow;
+        _db.Configs.Update(config);
+        await _db.SaveChangesAsync(ct);
+        return config;
+    }
+
+    public async Task<bool> DeleteConfigItem(Guid configId, Guid itemId, CancellationToken ct = default)
+    {
+        var config = _db.ConfigItems.FirstOrDefault(x=>x.ConfigId == configId && x.Id == itemId);
+        if (config is null)
+        {
+            return false;
+        }
+        _db.ConfigItems.Remove(config);
+        await _db.SaveChangesAsync(ct);
+        return true;
     }
 }

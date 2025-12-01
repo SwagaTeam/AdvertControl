@@ -1,3 +1,4 @@
+using System.Reactive.Linq;
 using Microsoft.Extensions.Options;
 using Minio;
 using Minio.ApiEndpoints;
@@ -93,45 +94,34 @@ public class MinioFileService
         return files;
     }
     
-    public async Task<List<byte[]>> GetFilesByUserAsync(string userId)
+    public async Task<List<byte[]>> GetUserFilesContentAsync(string userId)
     {
         var filesContent = new List<byte[]>();
         var tcs = new TaskCompletionSource<bool>();
 
-        var observable = _minioClient.ListObjectsAsync(
+        var observable = _minioClient.ListObjectsEnumAsync(
             new ListObjectsArgs()
                 .WithBucket(BucketName)
                 .WithRecursive(true)
-        );
+        ).ToBlockingEnumerable();
 
-        observable.Subscribe(
-            async item =>
-            {
-                if (item.Key.Contains($"_{userId}"))
-                {
-                    using (var memoryStream = new MemoryStream())
-                    {
-                        await _minioClient.GetObjectAsync(
-                            new GetObjectArgs()
-                                .WithBucket(BucketName)
-                                .WithObject(item.Key)
-                                .WithCallbackStream(stream => stream.CopyTo(memoryStream))
-                        );
+        foreach (var item in observable)
+        {
+            if (!item.Key.EndsWith($"{userId}"))
+                continue;
 
-                        filesContent.Add(memoryStream.ToArray());
-                    }
-                }
-            },
-            ex =>
-            {
-                tcs.SetException(ex);
-            },
-            () =>
-            {
-                tcs.SetResult(true);
-            });
+            using var ms = new MemoryStream();
+            await _minioClient.GetObjectAsync(
+                new GetObjectArgs()
+                    .WithBucket(BucketName)
+                    .WithObject(item.Key)
+                    .WithCallbackStream(stream => stream.CopyTo(ms))
+            );
 
-        await tcs.Task;
+            filesContent.Add(ms.ToArray());
+        }
+
         return filesContent;
     }
+
 }

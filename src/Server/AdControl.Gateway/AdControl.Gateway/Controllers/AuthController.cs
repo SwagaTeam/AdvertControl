@@ -1,6 +1,7 @@
 ﻿using AdControl.Gateway.Application.Dtos;
 using AdControl.Protos;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AdControl.Gateway.Controllers;
@@ -30,7 +31,10 @@ public class AuthController : ControllerBase
     {
         var request = new RegisterRequest
         {
-            Email = dto.Username,
+            Name = dto.Name,
+            SecondName = dto.SecondName,
+            Phone = dto.Phone,
+            Email = dto.Email,
             Password = dto.Password,
             RepeatPassword = dto.RepeatPassword,
             Roles = { dto.Roles }
@@ -79,6 +83,34 @@ public class AuthController : ControllerBase
     }
 
     /// <summary>
+    ///     Обновляет текущего пользователя.
+    /// </summary>
+    /// <param name="userId">ID обновляемого пользователя.</param>
+    /// <param name="dto">Данные для обновления пользователя.</param>
+    /// <returns>Информация об обновленном пользователе.</returns>
+    [Authorize]
+    [HttpPatch("update-current")]
+    [ProducesResponseType(typeof(UpdateUserResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> UpdateCurrent(UpdateUserDto dto)
+    {
+        var resp = await GetUserIdAsync();
+
+        var request = new UpdateUserRequest
+        {
+            Id = resp.Id,
+            Email = dto.Email,
+            FirstName = dto.Name,
+            LastName = dto.SecondName,
+            PhoneNumber = dto.Phone,
+        };
+
+        var result = await _authServiceClient.UpdateUserAsync(request);
+        return Ok(result);
+    }
+
+    /// <summary>
     ///     Получает идентификатор текущего пользователя по JWT-токену.
     /// </summary>
     [HttpPost("get-current-user-id")]
@@ -87,14 +119,33 @@ public class AuthController : ControllerBase
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> GetCurrentUserId()
     {
+        var resp = await GetUserIdAsync();
+        return Ok(resp);
+    }
+
+    [HttpPost("get-current-user-info")]
+    [Authorize]
+    [ProducesResponseType(typeof(UserInfoResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> GetCurrentUserInfo()
+    {
         var token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
-        var request = new UserIdRequest
+        var currentUserRequest = new UserIdRequest
         {
             Token = token
         };
 
-        var resp = await _authServiceClient.GetCurrentUserIdAsync(request);
-        return Ok(resp);
+        var currentUserIdResponse = await _authServiceClient.GetCurrentUserIdAsync(currentUserRequest);
+        
+        var id = currentUserIdResponse.Id;
+        
+        if (id is null)
+            return Unauthorized();
+
+        var userInfoRequest = new UserInfoRequest { Id = id };
+        var userInfoResponse = await _authServiceClient.GetUserInfoAsync(userInfoRequest);
+
+        return Ok(userInfoResponse);
     }
 
     /// <summary>
@@ -120,29 +171,17 @@ public class AuthController : ControllerBase
 
         return Ok(resp);
     }
-    
-    [HttpPost("get-current-user-info")]
-    [Authorize]
-    [ProducesResponseType(typeof(UserInfoResponse), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<IActionResult> GetCurrentUserInfo()
+
+    private async Task<UserIdResponse> GetUserIdAsync()
     {
         var token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
-        var currentUserRequest = new UserIdRequest
+        var request = new UserIdRequest
         {
             Token = token
         };
 
-        var currentUserIdResponse = await _authServiceClient.GetCurrentUserIdAsync(currentUserRequest);
-        
-        var id = currentUserIdResponse.Id;
-        
-        if (id is null)
-            return Unauthorized();
+        var resp = await _authServiceClient.GetCurrentUserIdAsync(request);
 
-        var userInfoRequest = new UserInfoRequest { Id = id };
-        var userInfoResponse = await _authServiceClient.GetUserInfoAsync(userInfoRequest);
-
-        return Ok(userInfoResponse);
+        return resp;
     }
 }

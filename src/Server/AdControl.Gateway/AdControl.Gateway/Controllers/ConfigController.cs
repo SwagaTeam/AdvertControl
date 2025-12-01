@@ -55,6 +55,8 @@ public class ConfigController : ControllerBase
                 req.Items.Add(ci);
             }
 
+        req.Name = dto.Name;
+
         var resp = await _screenClient.CreateConfigAsync(req, BuildAuthMetadata(HttpContext)).ResponseAsync;
         if (!string.IsNullOrEmpty(resp.Error)) return StatusCode(500, new { error = resp.Error });
         return CreatedAtAction(nameof(GetById), new { id = resp.Id }, new { id = resp.Id });
@@ -75,6 +77,23 @@ public class ConfigController : ControllerBase
             .ResponseAsync;
         if (resp.Config == null || string.IsNullOrEmpty(resp.Config.Id)) return NotFound();
         return Ok(resp.Config);
+    }
+
+    /// <summary>
+    ///     Получает конфигураци текущего пользователя.
+    /// </summary>
+    /// <response code="200">Конфигурация найдена</response>
+    /// <response code="404">Конфигурация не найдена</response>
+    [HttpGet("current")]
+    [Authorize]
+    [ProducesResponseType(typeof(List<Config>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetCurrentUserConfigs()
+    {
+        var resp = _screenClient.GetConfigs(new GetConfigsRequest(), BuildAuthMetadata(HttpContext));
+        if (resp.Configs == null || resp.Configs.Count == 0)
+            return NotFound();
+        return Ok(resp.Configs);
     }
 
     /// <summary>
@@ -119,8 +138,25 @@ public class ConfigController : ControllerBase
             Id = id,
             Items = { items }
         };
-        var response = await _screenClient.AddConfigItemsAsync(request);
+        var response = await _screenClient.AddConfigItemsAsync(request, BuildAuthMetadata(HttpContext));
         return Ok(response);
+    }
+    
+    [HttpDelete("{id}/remove-items")]
+    [Authorize]
+    [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> RemoveItem(string id, [FromBody] string itemId)
+    {
+        var configRequest = new GetConfigRequest { Id = id };
+        var configResponse = await _screenClient.GetConfigAsync(configRequest, BuildAuthMetadata(HttpContext)).ResponseAsync;
+        var removeItemRequest = new RemoveItemRequest
+        {
+            Id = id,
+            ItemId = itemId
+        };
+        var removeItemResponse = await _screenClient.RemoveConfigItemAsync(removeItemRequest, BuildAuthMetadata(HttpContext));
+        return Ok(removeItemResponse);
     }
 
     private Metadata BuildAuthMetadata(HttpContext http)

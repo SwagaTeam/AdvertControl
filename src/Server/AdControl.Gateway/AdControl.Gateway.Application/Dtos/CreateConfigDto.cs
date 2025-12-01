@@ -6,6 +6,11 @@
 public class CreateConfigDto
 {
     /// <summary>
+    /// Название конфига
+    /// </summary>
+    public string Name { get; set; }
+
+    /// <summary>
     ///     Список элементов конфигурации.
     /// </summary>
     public List<CreateConfigItemDto>? Items { get; set; }

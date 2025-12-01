@@ -13,9 +13,9 @@ public class ConfigService : IConfigService
         _repo = repo;
     }
 
-    public async Task<Config> CreateAsync(Guid? userId, IEnumerable<ConfigItem> items, CancellationToken ct = default)
+    public async Task<Config> CreateAsync(string name, Guid? userId, IEnumerable<ConfigItem> items, CancellationToken ct = default)
     {
-        var cfg = new Config { Id = Guid.NewGuid(), UserId = userId, CreatedAt = DateTime.UtcNow };
+        var cfg = new Config { Name = name, Id = Guid.NewGuid(), UserId = userId, CreatedAt = DateTime.UtcNow };
         cfg.Items = items.Select(i =>
         {
             i.Id = i.Id == Guid.Empty ? Guid.NewGuid() : i.Id;
@@ -46,7 +46,31 @@ public class ConfigService : IConfigService
     public async Task<Config?> AddItems(Guid configId, List<ConfigItem> items, CancellationToken ct = default)
     {
         var cfg = await GetAsync(configId, ct);
-        if (cfg is null) throw new NullReferenceException("Config not found");
+
+        if (cfg is null)
+        {
+            throw new NullReferenceException("Config not found");
+        }
+
+        cfg.UpdatedAt = DateTime.UtcNow;
+
+        await UpdateAsync(cfg);
+
         return await _repo.AddItems(configId, items, ct);
+    }
+
+    public async Task<IEnumerable<Config?>> GetUserConfigs(Guid userId, CancellationToken ct = default)
+    {
+        return await _repo.GetUserConfigs(userId, ct);
+    }
+
+    public async Task<Config> UpdateAsync(Config config, CancellationToken ct = default)
+    {
+        return await _repo.UpdateAsync(config, ct);
+    }
+
+    public async Task<bool> DeleteConfigItemAsync(Guid configId, Guid itemId, CancellationToken ct = default)
+    {
+        return await _repo.DeleteConfigItem(configId, itemId, ct);
     }
 }
