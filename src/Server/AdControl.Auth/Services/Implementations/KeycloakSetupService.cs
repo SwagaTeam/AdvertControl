@@ -5,7 +5,6 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 using AdControl.Auth.Models;
-using AdControl.Core.Constants;
 using AdControl.Protos;
 using Microsoft.Extensions.Options;
 
@@ -183,7 +182,7 @@ public class KeycloakSetupService : IKeycloakSetupService
         {
             Email = _defaultAdminUsername,
             Password =  _defaultAdminPassword,
-            Roles = new[] { RolesConstants.Admin },
+            Roles = new[] { "Admin" },
             Name = "Admin",
             SecondName = "",
             MasterToken = masterToken,
@@ -204,7 +203,7 @@ public class KeycloakSetupService : IKeycloakSetupService
         {
             Email = req.Email,
             Password = req.Password,
-            Roles = roles.Length > 0 ? roles : new[] { RolesConstants.User },
+            Roles = roles.Length > 0 ? roles : new[] { "User" },
             Name = req.Name,
             SecondName = req.SecondName,
             MasterToken = masterToken,

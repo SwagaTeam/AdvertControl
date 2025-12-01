@@ -84,7 +84,7 @@ public class ConfigController : ControllerBase
     /// <response code="404">Конфигурация не найдена</response>
     [HttpGet("current")]
     [Authorize]
-    [ProducesResponseType(typeof(Config), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(List<Config>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetCurrentUserConfigs()
     {

@@ -16,7 +16,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\AdControl.Core\AdControl.Core.csproj" />
       <ProjectReference Include="..\AdControl.Protos\AdControl.Protos.csproj" />
     </ItemGroup>
 
