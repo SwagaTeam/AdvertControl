@@ -55,6 +55,8 @@ public class ConfigController : ControllerBase
                 req.Items.Add(ci);
             }
 
+        req.Name = dto.Name;
+
         var resp = await _screenClient.CreateConfigAsync(req, BuildAuthMetadata(HttpContext)).ResponseAsync;
         if (!string.IsNullOrEmpty(resp.Error)) return StatusCode(500, new { error = resp.Error });
         return CreatedAtAction(nameof(GetById), new { id = resp.Id }, new { id = resp.Id });

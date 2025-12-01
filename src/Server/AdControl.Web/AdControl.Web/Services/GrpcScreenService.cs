@@ -168,7 +168,7 @@ public class GrpcScreenService : ScreenService.ScreenServiceBase
                 Order = i.Order
             }).ToList();
 
-            var cfg = await _configs.CreateAsync(userId, items);
+            var cfg = await _configs.CreateAsync(request.Name, userId, items);
             return new CreateConfigResponse { Id = cfg.Id.ToString(), Status = "created" };
         }
         catch (Exception ex)

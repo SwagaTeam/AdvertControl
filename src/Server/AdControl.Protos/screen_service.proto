@@ -39,6 +39,7 @@ message Config {
   int64 createdAt = 3;
   repeated ConfigItem items = 4;
   int64 version = 5;
+  string name = 6;
 }
 
 message ScreenConfig {
@@ -64,9 +65,10 @@ message ListUserScreensResponse {repeated Screen screens = 1; int32 total = 2;}
 /* Config requests */
 message CreateConfigRequest {
   repeated ConfigItem items = 1;
+  string Name = 2;
 }
 message CreateConfigResponse { string id = 1; string status = 2; string error = 3; }
-message GetConfigRequest { string id = 1; }
+message GetConfigRequest { string id = 1; string name = 2;}
 message GetConfigResponse { Config config = 1; }
 message GetConfigsRequest { }
 message GetConfigsResponse { repeated Config configs = 1; }
