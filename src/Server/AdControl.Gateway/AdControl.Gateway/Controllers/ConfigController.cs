@@ -78,6 +78,23 @@ public class ConfigController : ControllerBase
     }
 
     /// <summary>
+    ///     Получает конфигураци текущего пользователя.
+    /// </summary>
+    /// <response code="200">Конфигурация найдена</response>
+    /// <response code="404">Конфигурация не найдена</response>
+    [HttpGet("current")]
+    [Authorize]
+    [ProducesResponseType(typeof(Config), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetCurrentUserConfigs()
+    {
+        var resp = _screenClient.GetConfigs(new GetConfigsRequest(), BuildAuthMetadata(HttpContext));
+        if (resp.Configs == null || resp.Configs.Count == 0)
+            return NotFound();
+        return Ok(resp.Configs);
+    }
+
+    /// <summary>
     ///     Назначает конфигурацию экрану.
     /// </summary>
     /// <response code="200">Конфигурация успешно назначена</response>

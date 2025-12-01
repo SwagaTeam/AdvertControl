@@ -47,6 +47,13 @@ public class ConfigRepository : IConfigRepository
             .FirstOrDefault();
     }
 
+    public async Task<IEnumerable<Config?>> GetUserConfigs(Guid userId, CancellationToken ct = default)
+    {
+        var configs = _db.Configs.Where(config => config.UserId == userId);
+
+        return configs;
+    }
+
     public async Task<Config> CreateAsync(Config cfg, CancellationToken ct = default)
     {
         _db.Configs.Add(cfg);
