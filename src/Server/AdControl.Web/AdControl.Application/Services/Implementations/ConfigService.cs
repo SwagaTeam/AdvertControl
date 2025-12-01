@@ -54,4 +54,14 @@ public class ConfigService : IConfigService
     {
         return await _repo.GetUserConfigs(userId, ct);
     }
+
+    public async Task<Config> UpdateAsync(Config config, CancellationToken ct = default)
+    {
+        return await _repo.UpdateAsync(config, ct);
+    }
+
+    public async Task<bool> DeleteConfigItemAsync(Guid configId, Guid itemId, CancellationToken ct = default)
+    {
+        return await _repo.DeleteConfigItem(configId, itemId, ct);
+    }
 }

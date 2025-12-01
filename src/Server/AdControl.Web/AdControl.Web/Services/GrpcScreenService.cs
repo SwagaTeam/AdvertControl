@@ -262,6 +262,31 @@ public class GrpcScreenService : ScreenService.ScreenServiceBase
         return response;
     }
 
+    public override async Task<RemoveItemResponse> RemoveConfigItem(RemoveItemRequest request, ServerCallContext context)
+    {
+        var userIdString = GetUserIdFromMetadata(context);
+        Guid? userId = null;
+        if (Guid.TryParse(userIdString, out var g))
+            userId = g;
+        else throw new UnauthorizedAccessException();
+
+        try
+        {
+            var guidId = Guid.Parse(request.Id);
+            var guidItemId = Guid.Parse(request.ItemId);
+            var deleted = await _configs.DeleteConfigItemAsync(guidId, guidItemId);
+            return new RemoveItemResponse
+            {
+                Success = deleted,
+            };
+        }
+        catch (Exception ex)
+        {
+            _log.LogError(ex, "RemoveConfigItem failed");
+            return new RemoveItemResponse();
+        }
+    }
+
     public override async Task<AddItemsResponse> AddConfigItems(AddItemsRequest request, ServerCallContext context)
     {
         var userIdString = GetUserIdFromMetadata(context);

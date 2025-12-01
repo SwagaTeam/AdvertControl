@@ -74,7 +74,8 @@ message AssignConfigRequest { string screenId = 1; string configId = 2; bool isA
 message AssignConfigResponse { string id = 1; string status = 2; string error = 3; }
 message AddItemsRequest{string id = 1; repeated ConfigItem items = 2; }
 message AddItemsResponse{Config config = 1;}
-
+message RemoveItemRequest{string id = 1; string itemId = 2;}
+message RemoveItemResponse{bool success = 1;}
 
 /* Service */
 service ScreenService {
@@ -88,4 +89,5 @@ service ScreenService {
   rpc AssignConfigToScreen(AssignConfigRequest) returns (AssignConfigResponse);
   rpc GetListUserScreens(ListUserScreensRequest) returns (ListUserScreensResponse);
   rpc AddConfigItems(AddItemsRequest) returns (AddItemsResponse);
+  rpc RemoveConfigItem(RemoveItemRequest) returns (RemoveItemResponse);
 }

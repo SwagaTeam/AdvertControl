@@ -81,4 +81,23 @@ public class ConfigRepository : IConfigRepository
         await _db.SaveChangesAsync(ct);
         return await GetAsync(configId, ct);
     }
+    
+    public async Task<Config> UpdateAsync(Config config, CancellationToken ct = default)
+    {
+        _db.Configs.Update(config);
+        await _db.SaveChangesAsync(ct);
+        return config;
+    }
+
+    public async Task<bool> DeleteConfigItem(Guid configId, Guid itemId, CancellationToken ct = default)
+    {
+        var config = _db.ConfigItems.FirstOrDefault(x=>x.ConfigId == configId && x.Id == itemId);
+        if (config is null)
+        {
+            return false;
+        }
+        _db.ConfigItems.Remove(config);
+        await _db.SaveChangesAsync(ct);
+        return true;
+    }
 }

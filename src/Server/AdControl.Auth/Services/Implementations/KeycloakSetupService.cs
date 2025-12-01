@@ -263,63 +263,64 @@ public class KeycloakSetupService : IKeycloakSetupService
 
 
     private async Task CreateUserIfNotExistsAsync(CreateUserRequest request)
+{
+    var usersUrl =
+        $"{_keycloakBaseUrl}/admin/realms/{_defaultRealm}/users?username={Uri.EscapeDataString(request.Email)}";
+
+    using var getUserReq = new HttpRequestMessage(HttpMethod.Get, usersUrl);
+    getUserReq.Headers.Authorization = new AuthenticationHeaderValue("Bearer", request.MasterToken);
+    var getUserResp = await _httpClient.SendAsync(getUserReq);
+    getUserResp.EnsureSuccessStatusCode();
+
+    var users = JsonSerializer.Deserialize<List<JsonElement>>(await getUserResp.Content.ReadAsStringAsync())!;
+    string userId;
+
+    if (users.Any())
     {
-        var usersUrl =
-            $"{_keycloakBaseUrl}/admin/realms/{_defaultRealm}/users?username={Uri.EscapeDataString(request.Email)}";
-        using var getUserReq = new HttpRequestMessage(HttpMethod.Get, usersUrl);
-        getUserReq.Headers.Authorization = new AuthenticationHeaderValue("Bearer", request.MasterToken);
-        var getUserResp = await _httpClient.SendAsync(getUserReq);
-        getUserResp.EnsureSuccessStatusCode();
-        var users = JsonSerializer.Deserialize<List<JsonElement>>(await getUserResp.Content.ReadAsStringAsync())!;
-
-        string userId;
-        if (users.Any())
-        {
-            userId = users[0].GetProperty("id").GetString()!;
-        }
-        else
-        {
-            var userObj = new
-            {
-                request.Email,
-                enabled = true,
-                emailVerified = true,
-
-                firstName = request.Name,
-                lastName = request.SecondName,
-
-                credentials = new[]
-                {
-                    new { type = "password", value = request.Password, temporary = false }
-                },
-
-                attributes = new
-                {
-                    phoneNumber = new[] { request.Phone }
-                }
-            };
-
-            using var createUserReq =
-                new HttpRequestMessage(HttpMethod.Post, $"{_keycloakBaseUrl}/admin/realms/{_defaultRealm}/users")
-                {
-                    Content = new StringContent(JsonSerializer.Serialize(userObj), Encoding.UTF8, "application/json")
-                };
-            createUserReq.Headers.Authorization = new AuthenticationHeaderValue("Bearer", request.MasterToken);
-            var createUserResp = await _httpClient.SendAsync(createUserReq);
-            createUserResp.EnsureSuccessStatusCode();
-
-            // получить id созданного пользователя
-            using var getNewUserReq = new HttpRequestMessage(HttpMethod.Get, usersUrl);
-            getNewUserReq.Headers.Authorization = new AuthenticationHeaderValue("Bearer", request.MasterToken);
-            var newUserResp = await _httpClient.SendAsync(getNewUserReq);
-            newUserResp.EnsureSuccessStatusCode();
-            var newUsers =
-                JsonSerializer.Deserialize<List<JsonElement>>(await newUserResp.Content.ReadAsStringAsync())!;
-            userId = newUsers[0].GetProperty("id").GetString()!;
-        }
-
-        await AssignRolesAsync(userId, request.Roles, request.MasterToken);
+        userId = users[0].GetProperty("id").GetString()!;
     }
+    else
+    {
+        // Исправлено: поля с маленькой буквы, как ожидает Keycloak
+        var userObj = new
+        {
+            username = request.Email,
+            enabled = true,
+            emailVerified = true,
+            firstName = request.Name,
+            lastName = request.SecondName,
+            credentials = new[]
+            {
+                new { type = "password", value = request.Password, temporary = false }
+            },
+            attributes = new
+            {
+                phoneNumber = new[] { request.Phone }
+            }
+        };
+        
+        using var createUserReq =
+            new HttpRequestMessage(HttpMethod.Post, $"{_keycloakBaseUrl}/admin/realms/{_defaultRealm}/users")
+            {
+                Content = new StringContent(JsonSerializer.Serialize(userObj), Encoding.UTF8, "application/json")
+            };
+        createUserReq.Headers.Authorization = new AuthenticationHeaderValue("Bearer", request.MasterToken);
+
+        var createUserResp = await _httpClient.SendAsync(createUserReq);
+        createUserResp.EnsureSuccessStatusCode();
+
+        // получить id созданного пользователя
+        using var getNewUserReq = new HttpRequestMessage(HttpMethod.Get, usersUrl);
+        getNewUserReq.Headers.Authorization = new AuthenticationHeaderValue("Bearer", request.MasterToken);
+        var newUserResp = await _httpClient.SendAsync(getNewUserReq);
+        newUserResp.EnsureSuccessStatusCode();
+        var newUsers = JsonSerializer.Deserialize<List<JsonElement>>(await newUserResp.Content.ReadAsStringAsync())!;
+        userId = newUsers[0].GetProperty("id").GetString()!;
+    }
+
+    await AssignRolesAsync(userId, request.Roles, request.MasterToken);
+}
+
 
     public async Task UpdateUserAsync(string userId, string? email = null, string? firstName = null,
         string? lastName = null, string? phoneNumber = null)

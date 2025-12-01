@@ -136,7 +136,7 @@ public class ConfigController : ControllerBase
             Id = id,
             Items = { items }
         };
-        var response = await _screenClient.AddConfigItemsAsync(request);
+        var response = await _screenClient.AddConfigItemsAsync(request, BuildAuthMetadata(HttpContext));
         return Ok(response);
     }
     
@@ -146,10 +146,15 @@ public class ConfigController : ControllerBase
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> RemoveItem(string id, [FromBody] string itemId)
     {
-        var req = new GetConfigRequest { Id = id };
-        var response = await _screenClient.GetConfigAsync(req, BuildAuthMetadata(HttpContext)).ResponseAsync;
-        var items = response.Config.Items;
-        return Ok(items.Remove(items.FirstOrDefault(i => i.Id == itemId)));
+        var configRequest = new GetConfigRequest { Id = id };
+        var configResponse = await _screenClient.GetConfigAsync(configRequest, BuildAuthMetadata(HttpContext)).ResponseAsync;
+        var removeItemRequest = new RemoveItemRequest
+        {
+            Id = id,
+            ItemId = itemId
+        };
+        var removeItemResponse = await _screenClient.RemoveConfigItemAsync(removeItemRequest, BuildAuthMetadata(HttpContext));
+        return Ok(removeItemResponse);
     }
 
     private Metadata BuildAuthMetadata(HttpContext http)
