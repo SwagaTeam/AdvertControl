@@ -84,6 +84,7 @@ public class ConfigRepository : IConfigRepository
     
     public async Task<Config> UpdateAsync(Config config, CancellationToken ct = default)
     {
+        config.UpdatedAt = DateTime.UtcNow;
         _db.Configs.Update(config);
         await _db.SaveChangesAsync(ct);
         return config;

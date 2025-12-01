@@ -46,7 +46,16 @@ public class ConfigService : IConfigService
     public async Task<Config?> AddItems(Guid configId, List<ConfigItem> items, CancellationToken ct = default)
     {
         var cfg = await GetAsync(configId, ct);
-        if (cfg is null) throw new NullReferenceException("Config not found");
+
+        if (cfg is null)
+        {
+            throw new NullReferenceException("Config not found");
+        }
+
+        cfg.UpdatedAt = DateTime.UtcNow;
+
+        await UpdateAsync(cfg);
+
         return await _repo.AddItems(configId, items, ct);
     }
 
