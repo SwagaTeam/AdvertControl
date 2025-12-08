@@ -30,7 +30,7 @@ public class ConfigItemDto
     public int Order { get; set; }
 }
 
-public record ConfigDto(long Version, long UpdatedAt, ConfigItemDto[] Items, bool NotModified = false);
+public record ConfigDto(long Version, long UpdatedAt, ConfigItemDto[] Items, bool NotModified = false, int WindowCount = 1);
 
 public class PollingService
 {

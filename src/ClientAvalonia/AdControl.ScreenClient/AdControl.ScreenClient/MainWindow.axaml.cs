@@ -26,38 +26,53 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private long _knownVersion;
     private string _screenId;
-
-    public MainWindow()
+    public MainWindow(string? screenId = null, List<ConfigItemDto>? items = null)
     {
         InitializeComponent();
 
         _player = new PlayerService(VideoViewControl, ImageControl, JsonTable);
+
         _polling = App.Services?.GetRequiredService<PollingService>()
                    ?? throw new InvalidOperationException("PollingService not found");
 
         var cfg = App.Services?.GetService<IConfiguration>();
+    
         _screenId = cfg?["Screen:Id"] ?? Environment.GetEnvironmentVariable("SCREEN_ID") ?? string.Empty;
         _intervalSeconds = int.TryParse(cfg?["Polling:IntervalSeconds"], out var s) ? s : 5;
 
         DataContext = this;
         SetState(ScreenState.NotPaired);
 
-        if (!string.IsNullOrWhiteSpace(_screenId))
-        {
-            _ = StartAsync(_cts.Token);
-        }
-        else
-        {
-            _ = StartPairingLoopAsync(_cts.Token);
-        }
-
         StatusText.Text = string.IsNullOrWhiteSpace(_screenId)
             ? "ID экрана не установлено. Используйте привязку."
             : $"ID={_screenId}";
 
         ImageControl.IsVisible = true;
+
+        // Запускаем асинхронную инициализацию
+        _ = InitializeAsync();
     }
 
+    private async Task InitializeAsync()
+    {
+        if (!string.IsNullOrWhiteSpace(_screenId))
+        {
+            await CheckScreenExistAndAdjustAsync(_screenId);
+
+            if (!string.IsNullOrWhiteSpace(_screenId))
+            {
+                _ = StartAsync(_cts.Token);
+            }
+            else
+            {
+                _ = StartPairingLoopAsync(_cts.Token);
+            }
+        }
+        else
+        {
+            _ = StartPairingLoopAsync(_cts.Token);
+        }
+    }
 
     public ObservableCollection<ConfigItemDto> Items { get; } = new();
 
@@ -122,7 +137,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                     StatusText.Text = $"Ошибка привязки: {ex.Message}");
             }
 
-            await Task.Delay(TimeSpan.FromMinutes(5), token); // обновляем код каждые 5 минут
+            await Task.Delay(TimeSpan.FromMinutes(5), token); 
         }
     }
 
@@ -134,13 +149,12 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         if (exists is false)
         {
             await Dispatcher.UIThread.InvokeAsync(() =>
-            {
                 StatusText.Text =
-                    "Текущий ID экрана не существует в базе экранов. Он будет удалён и экран будет переключён в состояние подключения.";
-                Task.Delay(TimeSpan.FromSeconds(10));
-                SetState(ScreenState.NotPaired);
-            });
+                    "Текущий ID экрана не существует в базе экранов. Он будет удалён и экран будет переключён в состояние подключения.");
 
+            await Task.Delay(TimeSpan.FromSeconds(10));
+            await Dispatcher.UIThread.InvokeAsync(() => SetState(ScreenState.NotPaired));
+            
             await DeleteScreenId();
         }
         else
@@ -238,7 +252,19 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                 StatusText.Text = $"Ошибка во время цикла обращения к серверу: {ex.Message}");
         }
     }
+    
+    private void OpenPlayerWindows(ConfigDto cfg)
+    {
+        int windowCount = cfg.WindowCount > 0 ? cfg.WindowCount : 1;
 
+        for (int i = 0; i < windowCount; i++)
+        {
+            var win = new PlayerWindow(cfg.Items?.ToList());
+            win.Show();
+        }
+    }
+    
+    private bool _playerWindowsOpened;
 
     private async Task PollOnce(CancellationToken token)
     {
@@ -247,16 +273,6 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             await Dispatcher.UIThread.InvokeAsync(() => { StatusText.Text = "Обращение к серверу..."; });
 
             var cfg = await _polling.GetConfigAsync(_screenId, _knownVersion);
-
-            //var cfg = new ConfigDto(
-            //    1,
-            //    DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
-            //    new[]
-            //    {
-            //        new ConfigItemDto("1", "Image", "C:/321.png", "inlineData1", "checksum1", 1024, 5, 1)
-            //    }
-            //);
-
 
             if (cfg == null) throw new Exception("Конфиг пуст.");
 
@@ -270,12 +286,19 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
                 StatusText.Text = $"Загружен конфиг с версией {cfg.Version}";
             });
+
+            if (!_playerWindowsOpened)
+            {
+                _playerWindowsOpened = true;
+                await Dispatcher.UIThread.InvokeAsync(() => OpenPlayerWindows(cfg));
+            }
         }
         catch (Exception ex)
         {
             await Dispatcher.UIThread.InvokeAsync(() => { StatusText.Text = $"Ошибка: {ex.Message}"; });
         }
     }
+
 
 
     private async Task ShowItemsAsync(CancellationToken token)

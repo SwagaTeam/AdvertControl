@@ -1,0 +1,40 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vlc="clr-namespace:LibVLCSharp.Avalonia;assembly=LibVLCSharp.Avalonia"
+        x:Class="AdControl.ScreenClient.PlayerWindow"
+        Title="Player"
+        WindowState="FullScreen"
+        SystemDecorations="None"
+        Background="Black"
+        WindowStartupLocation="CenterScreen">
+    
+    <Grid>
+        <!-- Видео -->
+        <vlc:VideoView x:Name="VideoViewControl"
+                       HorizontalAlignment="Stretch"
+                       VerticalAlignment="Stretch"
+                       IsVisible="False" />
+
+        <!-- Изображение -->
+        <Image x:Name="ImageControl"
+               HorizontalAlignment="Stretch"
+               VerticalAlignment="Stretch"
+               Stretch="UniformToFill"
+               IsVisible="True" />
+
+        <!-- Таблица -->
+        <DataGrid x:Name="JsonTable"
+                  Margin="20"
+                  IsReadOnly="True"
+                  GridLinesVisibility="None"
+                  BorderThickness="0"
+                  AutoGenerateColumns="False"
+                  RowHeight="50"
+                  FontSize="20"
+                  FontFamily="Segoe UI"
+                  ColumnWidth="*"
+                  HeadersVisibility="Column"
+                  Background="#F5F7FA"
+                  IsVisible="False" />
+    </Grid>
+</Window>
