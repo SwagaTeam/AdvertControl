@@ -37,7 +37,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                    ?? throw new InvalidOperationException("PollingService not found");
 
         var cfg = App.Services?.GetService<IConfiguration>();
-    
+
+        _playerWindows = new List<PlayerWindow>();
         _screenId = cfg?["Screen:Id"] ?? Environment.GetEnvironmentVariable("SCREEN_ID") ?? string.Empty;
         _intervalSeconds = int.TryParse(cfg?["Polling:IntervalSeconds"], out var s) ? s : 5;
 
@@ -256,11 +257,11 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     
     private void OpenPlayerWindows(ConfigDto cfg)
     {
-        var windowCount = cfg.WindowCount > 0 ? cfg.WindowCount : 1;
+        var windowCount = cfg.WindowCount > 0 ? cfg.WindowCount : 0;
 
         for (var i = 0; i < windowCount; i++)
         {
-            var win = new PlayerWindow(cfg.Items?.ToList());
+            var win = new PlayerWindow(cfg.Items?.ToList(), i+1);
             _playerWindows.Add(win);
             win.Show();
         }
@@ -277,18 +278,24 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             var cfg = await _polling.GetConfigAsync(_screenId, _knownVersion);
 
             if (cfg == null) throw new Exception("Конфиг пуст.");
-
+            
+            
             _knownVersion = cfg.Version;
-
+            
             await Dispatcher.UIThread.InvokeAsync(() =>
             {
                 Items.Clear();
-                foreach (var i in cfg.Items ?? Array.Empty<ConfigItemDto>())
+                foreach (var i in cfg.Items)
                     Items.Add(i);
 
                 StatusText.Text = $"Загружен конфиг с версией {cfg.Version}";
             });
 
+            foreach (var pW in _playerWindows)
+            {
+                await Dispatcher.UIThread.InvokeAsync(() => pW.UpdateItems(cfg.Items.ToList()));
+            }
+            
             if (!_playerWindowsOpened)
             {
                 _playerWindowsOpened = true;
