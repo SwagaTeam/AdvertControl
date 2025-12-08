@@ -43,6 +43,27 @@ public class GrpcScreenService : ScreenService.ScreenServiceBase
         }
     }
 
+    public override async Task<DeleteScreenResponse> DeleteScreen(DeleteScreenRequest request,
+        ServerCallContext context)
+    {
+        try
+        {
+            var userIdString = GetUserIdFromMetadata(context);
+            Guid? userId = null;
+            if (Guid.TryParse(userIdString, out var g))
+                userId = g;
+            else
+                throw new UnauthorizedAccessException();
+            await _screens.DeleteAsync(Guid.Parse(request.Id), CancellationToken.None);
+            return new DeleteScreenResponse { Status = "success" };
+        }
+        catch (Exception ex)
+        {
+            _log.LogError(ex, "DeleteScreen failed");
+            return new DeleteScreenResponse { Error = ex.Message, Status = "error" };
+        }
+    }
+
     public override async Task<GetScreenResponse> GetScreen(GetScreenRequest request, ServerCallContext context)
     {
         var userIdString = GetUserIdFromMetadata(context);

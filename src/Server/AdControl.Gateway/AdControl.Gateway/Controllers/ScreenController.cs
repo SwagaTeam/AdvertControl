@@ -96,8 +96,17 @@ public class ScreenController : ControllerBase
     {
         var metadata = BuildAuthMetadata(HttpContext);
         var call = _screenClient.DeleteScreenAsync(new DeleteScreenRequest { Id = id }, metadata);
-        var resp = await call.ResponseAsync;
-        return StatusCode(501, "Delete not implemented in proto");
+
+        var req = new ListScreensRequest { FilterName =  "", Limit = 50, Offset = 0 };
+        var screensResponse = await _screenClient.ListScreensAsync(req, BuildAuthMetadata(HttpContext)).ResponseAsync;
+
+        if (screensResponse.Screens.Any(s => s.Id == id))
+        {
+            var resp = await call.ResponseAsync;
+            return Ok(resp);
+        }
+
+        return Unauthorized("Нельзя удалить чужой экран");
     }
 
     [HttpPost("update")]

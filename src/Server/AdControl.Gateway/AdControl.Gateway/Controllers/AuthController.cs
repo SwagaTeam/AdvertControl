@@ -101,8 +101,8 @@ public class AuthController : ControllerBase
         {
             Id = resp.Id,
             Email = dto.Email,
-            FirstName = dto.Name,
-            LastName = dto.SecondName,
+            FirstName = dto.FirstName,
+            LastName = dto.LastName,
             PhoneNumber = dto.Phone,
         };
 

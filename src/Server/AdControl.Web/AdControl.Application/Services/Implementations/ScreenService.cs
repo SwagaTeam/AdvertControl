@@ -59,4 +59,9 @@ public class ScreenService : IScreenService
         await _repo.UpdateAsync(screen, ct);
         return screen;
     }
+
+    public async Task DeleteAsync(Guid screenId, CancellationToken ct = default)
+    {
+        await _repo.DeleteAsync(screenId, ct);
+    }
 }

@@ -54,4 +54,16 @@ public class ScreenRepository : IScreenRepository
         return screens;
     }
 
+    public async Task DeleteAsync(Guid id, CancellationToken ct = default)
+    {
+        var existingScreen = await _db.Screens.FindAsync(id);
+
+        if (existingScreen is null)
+        {
+            throw new NullReferenceException("Такого экрана не существует");
+        }
+
+        _db.Screens.Remove(existingScreen);
+        await _db.SaveChangesAsync();
+    }
 }
