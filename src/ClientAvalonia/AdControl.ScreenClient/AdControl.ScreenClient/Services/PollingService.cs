@@ -5,10 +5,10 @@ using AdControl.Protos;
 
 namespace AdControl.ScreenClient.Services;
 
-public class ConfigItemDto
+public class ConfigItemDto : IEquatable<ConfigItemDto>
 {
     public ConfigItemDto(string id, string type, string url, string inlineData, string checksum, long size,
-        int durationSeconds, int order)
+        int durationSeconds, int order) 
     {
         Id = id;
         Type = type;
@@ -28,9 +28,29 @@ public class ConfigItemDto
     public long Size { get; set; }
     public int DurationSeconds { get; set; }
     public int Order { get; set; }
+    
+    public override bool Equals(object? obj)
+    {
+        if (obj is null) return false;
+        if (ReferenceEquals(this, obj)) return true;
+        if (obj.GetType() != GetType()) return false;
+        return Equals((ConfigItemDto)obj);
+    }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(Id, Type, Url, InlineData, Checksum, Size, DurationSeconds, Order);
+    }
+
+    public bool Equals(ConfigItemDto? other)
+    {
+        if (other is null) return false;
+        if (ReferenceEquals(this, other)) return true;
+        return Id == other.Id && Type == other.Type && Url == other.Url && InlineData == other.InlineData && Checksum == other.Checksum && Size == other.Size && DurationSeconds == other.DurationSeconds && Order == other.Order;
+    }
 }
 
-public record ConfigDto(long Version, long UpdatedAt, ConfigItemDto[] Items, bool NotModified = false);
+public record ConfigDto(long Version, long UpdatedAt, ConfigItemDto[] Items, bool NotModified = false, int WindowCount = 0);
 
 public class PollingService
 {

@@ -10,7 +10,7 @@ namespace AdControl.ScreenClient.Services;
 
 public class PlayerService : IDisposable
 {
-    private const string GatewayBaseUrl = "https://adcontrol.ru/api/files/by-url/";
+    private const string GatewayBaseUrl = "http://localhost:5000/api/files/by-url/";
     private readonly Image _imageControl;
     private readonly DataGrid _jsonTable;
     private readonly LibVLC _libVLC;
@@ -76,24 +76,21 @@ public class PlayerService : IDisposable
             _mediaPlayer.Stop();
         });
     }
-
-
-    public async Task ShowImageAsync(string fileName, int durationSeconds, CancellationToken token)
+    
+    public async Task ShowImageAsync(string fileName, int durationSeconds, CancellationToken token, bool isMainWindow = true)
     {
+        
         await Dispatcher.UIThread.InvokeAsync(() => ShowOnly(_imageControl));
         var url = GatewayBaseUrl + fileName;
         using var http = new HttpClient();
         using var response = await http.GetAsync(url, token);
         response.EnsureSuccessStatusCode();
         var imageBytes = await response.Content.ReadAsByteArrayAsync();
-
-
-        // �� ��������� MemoryStream �����
         var ms = new MemoryStream(imageBytes);
 
         await Dispatcher.UIThread.InvokeAsync(() => { _imageControl.Source = new Bitmap(ms); });
-
         await Task.Delay(TimeSpan.FromSeconds(durationSeconds), token);
+        
     }
 
 
