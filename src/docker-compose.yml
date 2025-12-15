@@ -153,9 +153,9 @@ services:
     image: alpine:3.18
     container_name: minio-init
     depends_on:
-       - minio
+      - minio
     volumes:
-       - ./minio-init.sh:/minio-init.sh:ro
+      - ./minio-init.sh:/minio-init.sh:ro
     entrypoint: ["sh", "/minio-init.sh"]
     restart: "no"
 
