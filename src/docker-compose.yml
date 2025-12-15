@@ -157,8 +157,6 @@ services:
     volumes:
        - ./minio-init.sh:/minio-init.sh:ro
     entrypoint: ["sh", "/minio-init.sh"]
-    networks:
-       - adcontrol-network
     restart: "no"
 
 volumes:
