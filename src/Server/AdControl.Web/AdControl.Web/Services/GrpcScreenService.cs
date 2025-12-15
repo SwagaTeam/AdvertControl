@@ -2,6 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Xml.Linq;
 using AdControl.Application.Services.Abstractions;
 using AdControl.Protos;
 using Grpc.Core;
@@ -97,7 +98,23 @@ public class GrpcScreenService : ScreenService.ScreenServiceBase
             .SelectMany(c => c.Items)
             .Select(i => i.Type);
 
-        return new GetScreenResponse { Screen = proto, Type = { types } };
+        var config = s.ScreenConfigs
+           .First(sc => sc.IsActive)
+           .Config;
+
+        var protoConfig = new Config();
+
+        if (config is not null)
+        {
+            protoConfig.CreatedAt = DateTimeToUnixMs(config.CreatedAt);
+            protoConfig.UpdatedAt = DateTimeToUnixMs(config.UpdatedAt);
+            protoConfig.UserId =  config.UserId.ToString();
+            protoConfig.Name = config.Name;
+            protoConfig.ScreensCount = config.ScreensCount;
+            protoConfig.Version = config.Version;
+        }
+
+        return new GetScreenResponse { Screen = proto, Type = { types }, Config = protoConfig };
     }
 
     public override async Task<ListUserScreensResponse> GetListUserScreens(ListUserScreensRequest request,
@@ -218,8 +235,13 @@ public class GrpcScreenService : ScreenService.ScreenServiceBase
 
         var proto = new Config
         {
-            Id = cfg.Id.ToString(), UserId = cfg.UserId?.ToString() ?? "", CreatedAt = DateTimeToUnixMs(cfg.CreatedAt), ScreensCount = cfg.ScreensCount
+            Id = cfg.Id.ToString(), 
+            UserId = cfg.UserId?.ToString() ?? "",
+            CreatedAt = DateTimeToUnixMs(cfg.CreatedAt),
+            ScreensCount = cfg.ScreensCount, 
+            UpdatedAt =  DateTimeToUnixMs(cfg.UpdatedAt)
         };
+
         foreach (var it in cfg.Items)
             proto.Items.Add(new Protos.ConfigItem
             {

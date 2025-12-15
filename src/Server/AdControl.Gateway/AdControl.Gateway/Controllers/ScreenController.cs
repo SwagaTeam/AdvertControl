@@ -67,7 +67,7 @@ public class ScreenController : ControllerBase
         var resp = await _screenClient.GetScreenAsync(req, metadata).ResponseAsync;
         if (resp.Screen == null || string.IsNullOrEmpty(resp.Screen.Id))
             return NotFound();
-        return Ok(resp.Screen);
+        return Ok(new { resp.Screen, resp.Type, resp.Config } );
     }
 
     /// <summary>
