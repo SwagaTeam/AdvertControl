@@ -92,7 +92,7 @@ public class ScreenController : ControllerBase
     /// <response code="200">Успешно получено</response>
     [HttpGet("dashboard")]
     [Authorize]
-    [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(GetDashboardResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> Dashboard()
     {
         return StatusCode(StatusCodes.Status501NotImplemented, "not implemented");
