@@ -99,7 +99,7 @@ public class GrpcScreenService : ScreenService.ScreenServiceBase
             .Select(i => i.Type);
 
         var config = s.ScreenConfigs
-           .First(sc => sc.IsActive)
+           .FirstOrDefault(sc => sc.IsActive)!
            .Config;
 
         var protoConfig = new Config();
