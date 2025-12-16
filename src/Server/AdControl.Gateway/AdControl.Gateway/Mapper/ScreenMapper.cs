@@ -10,6 +10,11 @@ namespace AdControl.Gateway.Mapper
     {
         public static ScreenDto MapToScreenDto(this Screen screen)
         {
+            if (screen.Id.Length <=0)
+            {
+                return new ScreenDto();
+            }
+            
             var screenDto = new ScreenDto
             {
                 Id = Guid.Parse(screen.Id),
