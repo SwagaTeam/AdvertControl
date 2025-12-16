@@ -310,16 +310,18 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                 StatusText.Text = $"Загружен конфиг с версией {cfg.Version}";
             });
 
-            foreach (var pW in _playerWindows)
-            {
-                await Dispatcher.UIThread.InvokeAsync(() => pW.UpdateItems(cfg.Items.ToList()));
-            }
-            
             if (!_playerWindowsOpened)
             {
                 _playerWindowsOpened = true;
                 await Dispatcher.UIThread.InvokeAsync(() => OpenPlayerWindows(cfg));
             }
+
+            foreach (var pW in _playerWindows)
+            {
+                await Dispatcher.UIThread.InvokeAsync(() => pW.UpdateItems(cfg.Items.ToList()));
+            }
+
+            
         }
         catch (Exception ex)
         {
@@ -342,6 +344,13 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                     break;
 
                 CurrentItem = item;
+
+                await Dispatcher.UIThread.InvokeAsync(() =>
+                {
+                    StatusText.Text = string.Empty;
+                    QrImage.IsVisible = false;
+                    PairCodeText.IsVisible = false;
+                });
 
                 switch (item.Type)
                 {

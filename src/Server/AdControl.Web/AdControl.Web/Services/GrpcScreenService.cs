@@ -2,6 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Xml.Linq;
 using AdControl.Application.Services.Abstractions;
 using AdControl.Protos;
 using Grpc.Core;
@@ -97,7 +98,47 @@ public class GrpcScreenService : ScreenService.ScreenServiceBase
             .SelectMany(c => c.Items)
             .Select(i => i.Type);
 
-        return new GetScreenResponse { Screen = proto, Type = { types } };
+
+        var activeScreenConfig = s.ScreenConfigs
+              .FirstOrDefault(sc => sc.IsActive);
+
+        var protoConfig = new Config();
+
+        if (activeScreenConfig is not null)
+        {
+            var config = activeScreenConfig.Config;
+            if (config is not null)
+            {
+                protoConfig = new Config
+                {
+                    Id = config.Id.ToString(),
+                    CreatedAt = DateTimeToUnixMs(config.CreatedAt),
+                    UpdatedAt = DateTimeToUnixMs(config.UpdatedAt),
+                    UserId = config.UserId.ToString(),
+                    Name = config.Name,
+                    ScreensCount = config.ScreensCount,
+                    Version = config.Version,
+                };
+
+                foreach (var it in config.Items)
+                    protoConfig.Items.Add(new Protos.ConfigItem
+                    {
+                        Id = it.Id.ToString(),
+                        ConfigId = it.ConfigId.ToString(),
+                        Type = Enum.TryParse<ItemType>(it.Type, true, out var t)
+                            ? t
+                            : ItemType.Image,
+                        Url = it.Url,
+                        InlineData = it.InlineData,
+                        Checksum = it.Checksum ?? "",
+                        Size = it.Size,
+                        DurationSeconds = it.DurationSeconds,
+                        Order = it.Order
+                    });
+            }
+        }
+
+        return new GetScreenResponse { Screen = proto, Config = protoConfig };
     }
 
     public override async Task<ListUserScreensResponse> GetListUserScreens(ListUserScreensRequest request,
@@ -218,8 +259,13 @@ public class GrpcScreenService : ScreenService.ScreenServiceBase
 
         var proto = new Config
         {
-            Id = cfg.Id.ToString(), UserId = cfg.UserId?.ToString() ?? "", CreatedAt = DateTimeToUnixMs(cfg.CreatedAt), ScreensCount = cfg.ScreensCount
+            Id = cfg.Id.ToString(), 
+            UserId = cfg.UserId?.ToString() ?? "",
+            CreatedAt = DateTimeToUnixMs(cfg.CreatedAt),
+            ScreensCount = cfg.ScreensCount, 
+            UpdatedAt =  DateTimeToUnixMs(cfg.UpdatedAt)
         };
+
         foreach (var it in cfg.Items)
             proto.Items.Add(new Protos.ConfigItem
             {

@@ -199,16 +199,14 @@ services:
 
 
   minio-init:
-    image: alpine:3.18
+    image: minio/mc:latest
     container_name: minio-init
     depends_on:
-       - minio
+      - minio
     volumes:
-       - ./minio-init.sh:/minio-init.sh:ro
-    entrypoint: ["sh", "/minio-init.sh"]
-    networks:
-       - adcontrol-network
-    restart: "no"
+      - miniodata:/data
+    entrypoint: ["sh", "-c", "mc alias set local http://minio:9000 minioaccess miniosecret && mc mb --ignore-existing local/files && mc anonymous set download local/files"]
+
 
 volumes:
   pgdata:
