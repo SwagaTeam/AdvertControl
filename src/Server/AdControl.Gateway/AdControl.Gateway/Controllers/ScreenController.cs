@@ -73,7 +73,7 @@ public class ScreenController : ControllerBase
         var cfg = resp.Config.MapToConfigDto();
         var screen = resp.Screen.MapToScreenDto();
 
-        return Ok(new { screen, resp.Type, cfg } );
+        return Ok(new { screen, cfg } );
     }
 
     /// <summary>
