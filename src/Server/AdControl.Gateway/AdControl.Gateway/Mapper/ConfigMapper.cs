@@ -5,8 +5,13 @@ namespace AdControl.Gateway.Mapper
 {
     public static class ConfigMapper
     {
-        public static ConfigDto MapToConfigDto(this Config config)
-        {
+        public static ConfigDto? MapToConfigDto(this Config config)
+        {   
+            if (config.Id.Length <= 0)
+            {
+                return null;
+            }
+
             var configDto = new ConfigDto
             {
                 Id = Guid.Parse(config.Id),
