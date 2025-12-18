@@ -62,7 +62,7 @@
 				</StackPanel>
 
 				<!-- QR-код -->
-				<Border Background="White" Padding="8" CornerRadius="8" VerticalAlignment="Center" HorizontalAlignment="Center">
+				<Border x:Name ="QrBorder" Background="White" Padding="8" CornerRadius="8" VerticalAlignment="Center" HorizontalAlignment="Center">
 					<Image x:Name="QrImage"
 						   Width="300"
 						   Height="300"

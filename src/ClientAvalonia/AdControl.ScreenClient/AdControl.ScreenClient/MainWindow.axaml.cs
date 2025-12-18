@@ -201,6 +201,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             {
                 PairCodeText.IsVisible = false;
                 QrImage.IsVisible = false;
+                QrBorder.IsVisible = false;
                 break;
             } 
             case ScreenState.NotPaired:
@@ -208,6 +209,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             {
                 QrImage.IsVisible = true;
                 PairCodeText.IsVisible = true;
+                QrBorder.IsVisible = true;
                 break;
             }   
         }
@@ -302,7 +304,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
             var cfg = await _polling.GetConfigAsync(_screenId, _knownVersion);
 
-            if (cfg == null) throw new Exception("Конфиг пуст.");
+            if (cfg == null) throw new Exception("Конфиг пуст либо не загружён :(");
             
             
             _knownVersion = cfg.Version;
@@ -331,7 +333,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         }
         catch (Exception ex)
         {
-            await Dispatcher.UIThread.InvokeAsync(() => { StatusText.Text = $"Ошибка: {ex.Message}"; });
+            await Dispatcher.UIThread.InvokeAsync(() => { StatusText.Text = $"{ex.Message}"; });
         }
     }
 
