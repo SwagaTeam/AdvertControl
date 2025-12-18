@@ -198,12 +198,18 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         switch (state)
         {
             case ScreenState.Paired:
+            {
                 PairCodeText.IsVisible = false;
+                QrImage.IsVisible = false;
                 break;
+            } 
             case ScreenState.NotPaired:
             case ScreenState.Pairing:
+            {
+                QrImage.IsVisible = true;
                 PairCodeText.IsVisible = true;
                 break;
+            }   
         }
     }
 
@@ -307,7 +313,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                 foreach (var i in cfg.Items)
                     Items.Add(i);
 
-                StatusText.Text = $"Загружен конфиг с версией {cfg.Version}";
+                StatusText.Text = $"";
             });
 
             if (!_playerWindowsOpened)
@@ -435,7 +441,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                 if (assigned)
                 {
                     _screenId = assignedScreenId ?? string.Empty;
-                    StatusText.Text = $"Связано. ID Экрана = {_screenId}";
+                    StatusText.Text = $"Связано.";
                     await Dispatcher.UIThread.InvokeAsync(() => SetState(ScreenState.Paired));
 
                     _ = StartLoopAsync(_cts.Token);
