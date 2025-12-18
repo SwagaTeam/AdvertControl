@@ -41,6 +41,8 @@ static void ConfigureKestrel(WebApplicationBuilder builder)
             listenOptions.UseHttps(certPath, certPassword);
             listenOptions.Protocols = HttpProtocols.Http1AndHttp2;
         });
+
+        options.Limits.MaxRequestBodySize = 100 * 1024 * 1024; // 100 MB
     });
 }
 
