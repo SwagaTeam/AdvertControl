@@ -109,7 +109,7 @@ static void ConfigureAuthentication(WebApplicationBuilder builder, string author
         .AddJwtBearer(options =>
         {
             options.Authority = authority;
-            options.RequireHttpsMetadata = true;
+            options.RequireHttpsMetadata = false;
             options.TokenValidationParameters = new TokenValidationParameters
             {
                 NameClaimType = "preferred_username",
