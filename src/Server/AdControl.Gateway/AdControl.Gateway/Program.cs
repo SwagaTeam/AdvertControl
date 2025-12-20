@@ -24,7 +24,8 @@ builder.WebHost.ConfigureKestrel(options =>
 
     options.ListenAnyIP(port, listenOptions => 
     {
-        listenOptions.UseHttps(certPath, certPassword);
+        if(!builder.Environment.IsDevelopment())
+            listenOptions.UseHttps(certPath, certPassword);
         listenOptions.Protocols = HttpProtocols.Http1AndHttp2;
     });
 });

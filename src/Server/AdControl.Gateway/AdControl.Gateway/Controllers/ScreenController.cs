@@ -93,7 +93,6 @@ public class ScreenController : ControllerBase
     }
 
     /// <summary>
-    ///     НЕ РАБОТАЕТ
     ///     Возвращает информацию для дашборда
     /// </summary>
     /// <response code="200">Успешно получено</response>
@@ -103,10 +102,11 @@ public class ScreenController : ControllerBase
     public async Task<IActionResult> Dashboard()
     {
         var req = new GetDashboardRequest();
-        var resp = await _screenClient.GetDashboardAsync(req);
+        var resp = await _screenClient.GetDashboardAsync(req, BuildAuthMetadata(HttpContext)).ResponseAsync;
 
         return Ok(resp);
     }
+
 
     /// <summary>
     ///     Удаление экрана (не реализовано).

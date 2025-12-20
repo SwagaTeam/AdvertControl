@@ -35,7 +35,7 @@ public class GrpcScreenService : ScreenService.ScreenServiceBase
             if (!Guid.TryParse(userIdString, out var userId))
                 throw new UnauthorizedAccessException();
 
-            var result = new GetDashboardResponse();
+            var result = new GetDashboardResponse() { Success = true, Dashboard = new Dashboard() };
             var screens = (await _screens.GetListByUserIdAsync(userId)).ToList();
 
             // Основные метрики
@@ -646,9 +646,10 @@ public class GrpcScreenService : ScreenService.ScreenServiceBase
         return screens
             .Select(s => new Protos.Action
             {
-                Screen = MapToProtoScreen(s),
+                Screen = s.Name,
                 Action_ = BuildActionStatus(s),
-                LastUpdate = s.UpdatedAt.ToString(),
+                LastUpdate = s.LastHeartbeatAt.HasValue && s.LastHeartbeatAt.Value.Year < 2025 ? 
+                             s.LastHeartbeatAt.Value.ToString() : s.UpdatedAt.ToString(),
                 Status = IsSuccess(s)
             })
             .ToList();
@@ -696,27 +697,7 @@ public class GrpcScreenService : ScreenService.ScreenServiceBase
 
     private bool IsSuccess(Domain.Models.Screen s)
     {
-        return !(s.LastHeartbeatAt.HasValue &&
-                 DateTime.UtcNow - s.LastHeartbeatAt.Value > TimeSpan.FromMinutes(3));
-    }
-
-    private Screen MapToProtoScreen(Domain.Models.Screen s)
-    {
-        return new Screen
-        {
-            Id = s.Id.ToString(),
-            UserId = s.UserId?.ToString() ?? "",
-            Name = s.Name,
-            Resolution = s.Resolution,
-            Location = s.Location,
-            LastHeartbeatAt = s.LastHeartbeatAt.HasValue
-                ? DateTimeToUnixMs(s.LastHeartbeatAt.Value)
-                : 0,
-            PairedAt = s.PairedAt.HasValue
-                ? DateTimeToUnixMs(s.PairedAt.Value)
-                : 0,
-            CreatedAt = DateTimeToUnixMs(s.CreatedAt),
-            UpdatedAt = DateTimeToUnixMs(s.UpdatedAt)
-        };
+        return s.LastHeartbeatAt is { } ts
+               && DateTime.UtcNow - ts <= TimeSpan.FromMinutes(3);
     }
 }
