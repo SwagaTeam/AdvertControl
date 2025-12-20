@@ -4,6 +4,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Xml.Linq;
 using AdControl.Application.Services.Abstractions;
+using AdControl.Gateway.Application.Dtos;
 using AdControl.Protos;
 using Google.Protobuf;
 using Grpc.Core;
@@ -26,42 +27,34 @@ public class GrpcScreenService : ScreenService.ScreenServiceBase
     }
 
     public override async Task<GetDashboardResponse> GetDashboard(GetDashboardRequest request,
-       ServerCallContext context)
+    ServerCallContext context)
     {
         try
         {
             var userIdString = GetUserIdFromMetadata(context);
-            Guid? userId = null;
-            if (Guid.TryParse(userIdString, out var g))
-                userId = g;
-            else
+            if (!Guid.TryParse(userIdString, out var userId))
                 throw new UnauthorizedAccessException();
 
             var result = new GetDashboardResponse();
+            var screens = (await _screens.GetListByUserIdAsync(userId)).ToList();
 
-            var screenListByUserId = await _screens.GetListByUserIdAsync((Guid)userId);
+            // Основные метрики
+            result.Dashboard.ActiveScreens = GetActiveScreensCount(screens);
+            result.Dashboard.ConnectedScreens = GetConnectedScreensCount(screens);
+            result.Dashboard.ErrorScreens = GetErrorScreensCount(screens);
+            result.Dashboard.WaitingScreens = GetWaitingScreensCount(screens);
 
-            result.Dashboard.ActiveScreens = screenListByUserId.Count();
-            result.Dashboard.ConnectedScreens = screenListByUserId.Where(s => s.PairedAt.Value.Year >= 2025).Count();
-            result.Dashboard.ErrorScreens = screenListByUserId.Where(s => DateTime.UtcNow - s.LastHeartbeatAt.Value > TimeSpan.FromMinutes(3)).Count();
-            result.Dashboard.WaitingScreens = screenListByUserId.Where(s => s.PairedAt.Value.Year >= 2025 && s.LastHeartbeatAt.Value.Year < 2025).Count();
+            // Локации
+            result.Dashboard.Locations.AddRange(GetLocations(screens));
 
-            result.Dashboard.Locations.AddRange
-                (
-                    new List<ScreenLocations>() 
-                    {
-                        new ScreenLocations()
-                        {
-                            
-                        }
-                    }
-                );
+            // Действия
+            result.Dashboard.Actions.AddRange(GetActions(screens));
 
-
+            return result;
         }
         catch (Exception ex)
         {
-            _log.LogError(ex, "CreateScreen failed");
+            _log.LogError(ex, "GetDashboard failed");
             return new GetDashboardResponse { Success = false, Error = ex.Message };
         }
     }
@@ -604,5 +597,126 @@ public class GrpcScreenService : ScreenService.ScreenServiceBase
 
         var sub = jwt.Claims.FirstOrDefault(c => c.Type == "sub" || c.Type == ClaimTypes.NameIdentifier)?.Value;
         return sub;
+    }
+
+    private int GetActiveScreensCount(List<Domain.Models.Screen> screens)
+    {
+        return screens.Count;
+    }
+
+    private int GetConnectedScreensCount(List<Domain.Models.Screen> screens)
+    {
+        return screens.Count(s =>
+            s.PairedAt.HasValue &&
+            s.PairedAt.Value.Year >= 2025 &&
+            s.LastHeartbeatAt.HasValue &&
+            s.LastHeartbeatAt.Value.Year < 2025);
+    }
+
+    private int GetErrorScreensCount(List<Domain.Models.Screen> screens)
+    {
+        return screens.Count(s =>
+            s.LastHeartbeatAt.HasValue &&
+            DateTime.UtcNow - s.LastHeartbeatAt.Value > TimeSpan.FromMinutes(3));
+    }
+
+    private int GetWaitingScreensCount(List<Domain.Models.Screen> screens)
+    {
+        return screens.Count(s =>
+            s.PairedAt.HasValue &&
+            s.PairedAt.Value.Year >= 2025 &&
+            s.LastHeartbeatAt.HasValue &&
+            s.LastHeartbeatAt.Value.Year < 2025);
+    }
+
+    private List<ScreenLocations> GetLocations(List<Domain.Models.Screen> screens)
+    {
+        return screens
+            .GroupBy(s => s.Location)
+            .Select(g => new ScreenLocations
+            {
+                ScreenLocation = g.Key,
+                Count = g.Count()
+            })
+            .ToList();
+    }
+
+    private List<Protos.Action> GetActions(List<Domain.Models.Screen> screens)
+    {
+        return screens
+            .Select(s => new Protos.Action
+            {
+                Screen = MapToProtoScreen(s),
+                Action_ = BuildActionStatus(s),
+                LastUpdate = s.UpdatedAt.ToString(),
+                Status = IsSuccess(s)
+            })
+            .ToList();
+    }
+
+    private string BuildActionStatus(Domain.Models.Screen s)
+    {
+        var isSuccess = IsSuccess(s);
+
+        if (!isSuccess)
+            return "Соединение потеряно";
+
+        // Добавлен экран
+        if (s.PairedAt.HasValue &&
+            s.PairedAt.Value.Year < 2025)
+            return "Добавлен экран";
+
+        // Синхронизирован
+        if (s.PairedAt.HasValue &&
+            s.PairedAt.Value.Year >= 2025 &&
+            s.LastHeartbeatAt.HasValue &&
+            s.LastHeartbeatAt.Value.Year < 2025)
+            return "Синхронизирован";
+
+        // Изменена конфигурация
+        var lastConfigUpdate = s.ScreenConfigs
+            .OrderByDescending(c => c.Config.UpdatedAt)
+            .FirstOrDefault()?.Config.UpdatedAt;
+
+        if (lastConfigUpdate.HasValue &&
+            (DateTime.UtcNow - lastConfigUpdate.Value).TotalSeconds < 5)
+            return "Изменена конфигурация";
+
+        // Контент обновлён
+        if (s.LastHeartbeatAt.HasValue)
+        {
+            var diff = (DateTime.UtcNow - s.LastHeartbeatAt.Value).TotalSeconds;
+
+            if (diff <= 5)
+                return "Контент обновлен";
+        }
+
+        return "";
+    }
+
+    private bool IsSuccess(Domain.Models.Screen s)
+    {
+        return !(s.LastHeartbeatAt.HasValue &&
+                 DateTime.UtcNow - s.LastHeartbeatAt.Value > TimeSpan.FromMinutes(3));
+    }
+
+    private Screen MapToProtoScreen(Domain.Models.Screen s)
+    {
+        return new Screen
+        {
+            Id = s.Id.ToString(),
+            UserId = s.UserId?.ToString() ?? "",
+            Name = s.Name,
+            Resolution = s.Resolution,
+            Location = s.Location,
+            LastHeartbeatAt = s.LastHeartbeatAt.HasValue
+                ? DateTimeToUnixMs(s.LastHeartbeatAt.Value)
+                : 0,
+            PairedAt = s.PairedAt.HasValue
+                ? DateTimeToUnixMs(s.PairedAt.Value)
+                : 0,
+            CreatedAt = DateTimeToUnixMs(s.CreatedAt),
+            UpdatedAt = DateTimeToUnixMs(s.UpdatedAt)
+        };
     }
 }
