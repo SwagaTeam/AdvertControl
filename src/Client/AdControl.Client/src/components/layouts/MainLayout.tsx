@@ -1,6 +1,6 @@
 import {useState } from "react";
-import { Header } from "../Header";
-import { Sidebar } from "../Sidebar";
+import { Header } from "./Header.tsx";
+import { Sidebar } from "./Sidebar.tsx";
 import {Outlet} from "react-router-dom";
 
 

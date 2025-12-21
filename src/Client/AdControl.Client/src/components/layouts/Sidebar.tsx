@@ -1,6 +1,6 @@
 import { LayoutDashboard, Monitor, Settings, FileText, ChevronLeft } from "lucide-react";
-import { Button } from "./ui/button";
-import { cn } from "./ui/utils";
+import { Button } from "../ui/button.tsx";
+import { cn } from "../ui/utils.ts";
 import { Link, useLocation } from "react-router-dom";
 
 interface SidebarProps {

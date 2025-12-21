@@ -1,7 +1,7 @@
 import { Search, ChevronDown } from "lucide-react";
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-import { Button } from "./ui/button";
-import { Input } from "./ui/input";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar.tsx";
+import { Button } from "../ui/button.tsx";
+import { Input } from "../ui/input.tsx";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,11 +9,11 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "./ui/dropdown-menu";
+} from "../ui/dropdown-menu.tsx";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchProfile } from "../store/profileSlice.ts";
-import { logoutUser } from "../store/authSlice";
+import { fetchProfile } from "../../store/profileSlice.ts";
+import { logoutUser } from "../../store/authSlice.ts";
 import { useNavigate } from "react-router-dom";
 import ContentLoader from "react-content-loader";
 
