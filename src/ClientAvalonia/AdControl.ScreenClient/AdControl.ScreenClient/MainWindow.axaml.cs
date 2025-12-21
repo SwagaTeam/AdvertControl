@@ -27,9 +27,9 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private List<PlayerWindow>? _playerWindows;
     private const string CreateScreenUrlTemplate = "https://advertcontrol.ru/screens/create-screen?code={0}";
     private bool isStatic;
-
-    private long _knownVersion;
+    private long _knownVersion = -1;
     private string _screenId;
+
     public MainWindow(string? screenId = null, List<ConfigItemDto>? items = null)
     {
         InitializeComponent();

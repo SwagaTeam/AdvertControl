@@ -56,7 +56,11 @@ static void ConfigureServices(WebApplicationBuilder builder)
     builder.Services.AddScoped<IConfigService, ConfigService>();
 
     // gRPC
-    builder.Services.AddGrpc();
+    builder.Services.AddGrpc(options =>
+    {
+        options.MaxReceiveMessageSize = 1024 * 1024 * 100; // 100 MB
+        options.MaxSendMessageSize    = 1024 * 1024 * 100;
+    });
 
     // Minio
     builder.Services.Configure<MinioSettings>(builder.Configuration.GetSection("Minio"));

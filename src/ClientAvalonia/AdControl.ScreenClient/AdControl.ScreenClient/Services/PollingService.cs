@@ -109,7 +109,7 @@ public class PollingService
         _avaloniaClient = avaloniaClient;
     }
 
-    public async Task<ConfigDto?> GetConfigAsync(string screenId, long knownVersion = 0)
+    public async Task<ConfigDto?> GetConfigAsync(string screenId, long knownVersion = -1)
     {
         var client = _http.CreateClient("gateway");
         try

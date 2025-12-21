@@ -176,13 +176,23 @@ static void ConfigureGrpcClients(WebApplicationBuilder builder)
 static void AddGrpcClient<TClient>(WebApplicationBuilder builder, string configKey, string defaultAddress)
     where TClient : class
 {
-    builder.Services.AddGrpcClient<TClient>(o =>
-            o.Address = new Uri(builder.Configuration[configKey] ?? defaultAddress))
+    builder.Services
+        .AddGrpcClient<TClient>(o =>
+        {
+            o.Address = new Uri(builder.Configuration[configKey] ?? defaultAddress);
+        })
+        .ConfigureChannel(options =>
+        {
+            options.MaxReceiveMessageSize = 1024 * 1024 * 100;
+            options.MaxSendMessageSize    = 1024 * 1024 * 100;
+        })
         .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
         {
-            ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+            ServerCertificateCustomValidationCallback =
+                HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
         });
 }
+
 
 static void ConfigureMinio(WebApplicationBuilder builder)
 {

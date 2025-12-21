@@ -94,7 +94,13 @@ public class KeycloakSetupService : IKeycloakSetupService
             if (resp.StatusCode == HttpStatusCode.NotFound)
             {
                 var createRealmUrl = $"{_keycloakBaseUrl}/admin/realms";
-                var realmObj = new { realm = _defaultRealm, enabled = true, registrationAllowed = true };
+                var realmObj = new
+                {
+                    realm = _defaultRealm,
+                    enabled = true,
+                    registrationAllowed = true,
+                    accessTokenLifespan = 10800 // 3 часа в секундах
+                };
                 using var createReq = new HttpRequestMessage(HttpMethod.Post, createRealmUrl)
                 {
                     Content = new StringContent(JsonSerializer.Serialize(realmObj), Encoding.UTF8, "application/json")
@@ -122,7 +128,11 @@ public class KeycloakSetupService : IKeycloakSetupService
                     enabled = true,
                     publicClient = true,
                     directAccessGrantsEnabled = true,
-                    standardFlowEnabled = true
+                    standardFlowEnabled = true,
+                    attributes = new Dictionary<string, string>
+                    {
+                        ["access.token.lifespan"] = "10800"
+                    }
                 };
                 using var createClientReq = new HttpRequestMessage(HttpMethod.Post, clientsUrl)
                 {
