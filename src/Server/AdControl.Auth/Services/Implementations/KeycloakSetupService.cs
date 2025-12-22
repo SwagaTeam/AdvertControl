@@ -4,6 +4,7 @@ using System.Net;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using AdControl.Auth.Models;
 using AdControl.Protos;
 using Microsoft.Extensions.Hosting;
@@ -221,20 +222,19 @@ public class KeycloakSetupService : IKeycloakSetupService
         var realmJson = await getResp.Content.ReadAsStringAsync();
 
         // Десериализуем в динамический объект
-        var realm = JsonSerializer.Deserialize<Dictionary<string, object>>(realmJson);
+        var realmNode = JsonNode.Parse(realmJson).AsObject();
 
         // Меняем только тайминги
-        realm["accessTokenLifespan"] = 2592000;                 // 30 дней
-        realm["accessTokenLifespanForImplicitFlow"] = 2592000; // 30 дней
-        realm["ssoSessionIdleTimeout"] = 2592000;
-        realm["ssoSessionMaxLifespan"] = 2592000;
-        realm["clientSessionIdleTimeout"] = 2592000;
-        realm["clientSessionMaxLifespan"] = 2592000;
+        realmNode["accessTokenLifespan"] = 2592000;
+        realmNode["ssoSessionIdleTimeout"] = 2592000;
+        realmNode["ssoSessionMaxLifespan"] = 2592000;
+        realmNode["clientSessionIdleTimeout"] = 2592000;
+        realmNode["clientSessionMaxLifespan"] = 2592000;
 
         // Отправляем обратно весь объект
         var patchReq = new HttpRequestMessage(HttpMethod.Put, $"{_keycloakBaseUrl}/admin/realms/{_defaultRealm}");
         patchReq.Headers.Authorization = new AuthenticationHeaderValue("Bearer", masterToken);
-        patchReq.Content = new StringContent(JsonSerializer.Serialize(realm), Encoding.UTF8, "application/json");
+        patchReq.Content = new StringContent(realmNode.ToJsonString(), Encoding.UTF8, "application/json");
 
         var patchResp = await _httpClient.SendAsync(patchReq);
         patchResp.EnsureSuccessStatusCode();
