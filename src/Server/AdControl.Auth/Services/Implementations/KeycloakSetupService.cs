@@ -222,13 +222,14 @@ public class KeycloakSetupService : IKeycloakSetupService
             realm = "myrealm",
             enabled = true,
             registrationAllowed = true,
-            accessTokenLifespan = 999999999,
-            accessTokenLifespanForImplicitFlow = 999999999,
-            ssoSessionIdleTimeout = 999999999,
-            ssoSessionMaxLifespan = 999999999,
-            clientSessionIdleTimeout = 999999999,
-            clientSessionMaxLifespan = 999999999
+            accessTokenLifespan = 2592000,                 // 30 дней
+            accessTokenLifespanForImplicitFlow = 2592000, // 30 дней
+            ssoSessionIdleTimeout = 2592000,              // 30 дней
+            ssoSessionMaxLifespan = 2592000,              // 30 дней
+            clientSessionIdleTimeout = 2592000,           // 30 дней
+            clientSessionMaxLifespan = 2592000           // 30 дней
         };
+
 
         patchReq.Content = new StringContent(JsonSerializer.Serialize(body), Encoding.UTF8, "application/json");
 
