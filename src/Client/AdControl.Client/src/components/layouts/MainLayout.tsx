@@ -1,6 +1,6 @@
 import {useState } from "react";
-import { Header } from "../Header";
-import { Sidebar } from "../Sidebar";
+import { Header } from "./Header.tsx";
+import { Sidebar } from "./Sidebar.tsx";
 import {Outlet} from "react-router-dom";
 
 
@@ -20,7 +20,7 @@ export const MainLayout = () => {
                     marginLeft: "4rem",
                 }}
             >
-                <div className="p-8"><Outlet /></div>
+                <div style={{ padding: "1rem 1.5rem 0 1.5rem "}}><Outlet /></div>
             </main>
         </div>
     );
