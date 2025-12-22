@@ -152,6 +152,7 @@ public class GrpcScreenService : ScreenService.ScreenServiceBase
                     UserId = config.UserId.ToString(),
                     Name = config.Name,
                     ScreensCount = config.ScreensCount,
+                    IsStatic = config.IsStatic,
                     Version = config.Version,
                 };
 
@@ -266,7 +267,7 @@ public class GrpcScreenService : ScreenService.ScreenServiceBase
                 Order = i.Order
             }).ToList();
 
-            var cfg = await _configs.CreateAsync(request.Name, userId, items, request.ScreensCount);
+            var cfg = await _configs.CreateAsync(request.Name, userId, items, request.ScreensCount, request.IsStatic);
             return new CreateConfigResponse { Id = cfg.Id.ToString(), Status = "created" };
         }
         catch (Exception ex)
@@ -298,6 +299,7 @@ public class GrpcScreenService : ScreenService.ScreenServiceBase
             UserId = cfg.UserId?.ToString() ?? "",
             CreatedAt = DateTimeToUnixMs(cfg.CreatedAt),
             ScreensCount = cfg.ScreensCount, 
+            IsStatic = cfg.IsStatic,
             UpdatedAt =  DateTimeToUnixMs(cfg.UpdatedAt),
             Name = cfg.Name,
         };
@@ -319,7 +321,7 @@ public class GrpcScreenService : ScreenService.ScreenServiceBase
             });
         return new GetConfigResponse { Config = proto };
     }
-
+    
     public override async Task<GetConfigsResponse> GetConfigs(GetConfigsRequest request, ServerCallContext context)
     {
         var userIdString = GetUserIdFromMetadata(context);
@@ -342,7 +344,8 @@ public class GrpcScreenService : ScreenService.ScreenServiceBase
                 UserId = cfg.UserId?.ToString() ?? "",
                 CreatedAt = DateTimeToUnixMs(cfg.CreatedAt),
                 Version = cfg.Version,
-                ScreensCount = cfg.ScreensCount
+                ScreensCount = cfg.ScreensCount,
+                IsStatic = cfg.IsStatic,
             };
 
             foreach (var it in cfg.Items)
@@ -441,6 +444,7 @@ public class GrpcScreenService : ScreenService.ScreenServiceBase
 
             var name = request.Name;
             var screensCount = request.ScreensCount;
+            var isStatic = request.IsStatic;
             
             if (name is not null && !string.IsNullOrEmpty(name))
             {
@@ -450,6 +454,8 @@ public class GrpcScreenService : ScreenService.ScreenServiceBase
             {
                 config.ScreensCount = screensCount;
             }
+
+            config.IsStatic = isStatic;
             
             var newConfig = await _configs.UpdateAsync(config);
             return new UpdateConfigResponse
@@ -525,7 +531,8 @@ public class GrpcScreenService : ScreenService.ScreenServiceBase
             var protoCfg = new Config
             {
                 Id = cfg.Id.ToString(), UserId = cfg.UserId?.ToString() ?? "",
-                CreatedAt = DateTimeToUnixMs(cfg.CreatedAt), Items = { protoItems }
+                UpdatedAt = DateTimeToUnixMs(cfg.UpdatedAt), 
+                Items = { protoItems }
             };
             var response = new AddItemsResponse
             {
