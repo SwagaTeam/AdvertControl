@@ -48,7 +48,8 @@ public class KeycloakSetupService : IKeycloakSetupService
 
         var resp = await _httpClient.SendAsync(req);
         var result = resp.Content.ReadAsStringAsync();
-        if (!resp.IsSuccessStatusCode) return null;
+        if (!resp.IsSuccessStatusCode)
+            return null;
 
         var body = await resp.Content.ReadAsStringAsync();
         using var doc = JsonDocument.Parse(body);
@@ -59,7 +60,8 @@ public class KeycloakSetupService : IKeycloakSetupService
 
     public async Task<JsonElement?> GetUserByIdAsync(string userId)
     {
-        if (string.IsNullOrWhiteSpace(userId)) return null;
+        if (string.IsNullOrWhiteSpace(userId))
+            return null;
 
         var masterToken = await AcquireMasterTokenAsync();
         var url = $"{_keycloakBaseUrl}/admin/realms/{_defaultRealm}/users/{userId}";
@@ -68,7 +70,8 @@ public class KeycloakSetupService : IKeycloakSetupService
         req.Headers.Authorization = new AuthenticationHeaderValue("Bearer", masterToken);
 
         using var resp = await _httpClient.SendAsync(req);
-        if (resp.StatusCode == HttpStatusCode.NotFound) return null;
+        if (resp.StatusCode == HttpStatusCode.NotFound)
+            return null;
         resp.EnsureSuccessStatusCode();
 
         var body = await resp.Content.ReadAsStringAsync();
@@ -99,7 +102,12 @@ public class KeycloakSetupService : IKeycloakSetupService
                     realm = _defaultRealm,
                     enabled = true,
                     registrationAllowed = true,
-                    accessTokenLifespan = 9999999 // 3 часа в секундах
+
+                    accessTokenLifespan = 999999999,              
+                    ssoSessionIdleTimeout = 999999999,            
+                    ssoSessionMaxLifespan = 999999999,            
+                    clientSessionIdleTimeout = 999999999,
+                    clientSessionMaxLifespan = 999999999
                 };
                 using var createReq = new HttpRequestMessage(HttpMethod.Post, createRealmUrl)
                 {
@@ -131,7 +139,9 @@ public class KeycloakSetupService : IKeycloakSetupService
                     standardFlowEnabled = true,
                     attributes = new Dictionary<string, string>
                     {
-                        ["access.token.lifespan"] = "9999999"
+                        ["access.token.lifespan"] = "999999999",
+                        ["client.session.max.lifespan"] = "999999999",
+                        ["client.session.idle.timeout"] = "999999999"
                     }
                 };
                 using var createClientReq = new HttpRequestMessage(HttpMethod.Post, clientsUrl)
@@ -378,7 +388,8 @@ public class KeycloakSetupService : IKeycloakSetupService
             .Select(r => new { id = r.GetProperty("id").GetString(), name = r.GetProperty("name").GetString() })
             .ToList();
 
-        if (!rolesToAssign.Any()) return;
+        if (!rolesToAssign.Any())
+            return;
 
         var assignUrl = $"{_keycloakBaseUrl}/admin/realms/{_defaultRealm}/users/{userId}/role-mappings/realm";
         using var assignReq = new HttpRequestMessage(HttpMethod.Post, assignUrl)
