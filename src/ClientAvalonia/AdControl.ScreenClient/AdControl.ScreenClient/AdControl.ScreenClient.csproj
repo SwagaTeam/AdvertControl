@@ -7,6 +7,7 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
     <ImplicitUsings>enable</ImplicitUsings>
+    <ApplicationIcon>AdvertControl_Icon.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
@@ -38,6 +39,9 @@
   </ItemGroup>
   <ItemGroup>
     <AvaloniaUILicenseKey Include="avln_on_key:v1:796b878acd8e4386a4f16fb0f1ee83f0" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="AdvertControl_Icon.ico" />
   </ItemGroup>
 	<ItemGroup>
 		<None Update="appsettings.json">
