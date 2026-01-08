@@ -11,7 +11,13 @@ using OperationCanceledException = Android.OS.OperationCanceledException;
 
 namespace AdControl.ScreenClient.Android
 {
-    [Activity(Label = "@string/app_name", MainLauncher = true)]
+    [Activity(
+        Name = "com.swaga.advertcontrol.MainActivity",
+        Label = "@string/app_name",
+        MainLauncher = true,
+        Exported = true,
+        Theme = "@style/Theme.AppCompat.NoActionBar"
+    )]
     public class MainActivity : Activity
     {
         private VideoView _videoView;
@@ -23,7 +29,7 @@ namespace AdControl.ScreenClient.Android
 
         private IFileCacheService _fileCache;
         private PollingService _polling;
-        private AndroidPlayerService _player; // конкретная реализация с TableLayout
+        private AndroidPlayerService _player;
         private IQrGenerator _qrGenerator;
 
         private CancellationTokenSource _cts = new();

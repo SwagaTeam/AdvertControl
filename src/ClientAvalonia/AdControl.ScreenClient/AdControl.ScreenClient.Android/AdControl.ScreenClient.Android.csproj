@@ -8,6 +8,7 @@
     <ApplicationId>com.companyname.AdControl.ScreenClient.Android</ApplicationId>
     <ApplicationVersion>1</ApplicationVersion>
     <ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
+	<EmbedAssembliesIntoApk>true</EmbedAssembliesIntoApk>
     <!--
       Enables trim analyzers and full trimming during Release mode.
       To learn more, see: https://learn.microsoft.com/dotnet/core/deploying/trimming/trimming-options#trimming-granularity

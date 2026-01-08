@@ -1,61 +1,101 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#000000">
 
+	<!-- Видео -->
 	<VideoView
-		android:id="@+id/videoView"
-		android:layout_width="match_parent"
-		android:layout_height="match_parent"
-		android:visibility="gone" />
+        android:id="@+id/videoView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone" />
 
+	<!-- Изображение -->
 	<ImageView
-		android:id="@+id/imageView"
-		android:layout_width="match_parent"
-		android:layout_height="match_parent"
-		android:scaleType="centerCrop"
-		android:visibility="gone" />
+        android:id="@+id/imageView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:visibility="gone" />
 
-	<!-- Таблица (скроллируемая) -->
+	<!-- Таблица (Scroll + TableLayout) -->
 	<ScrollView
-		android:id="@+id/tableScroll"
-		android:layout_width="match_parent"
-		android:layout_height="match_parent"
-		android:visibility="gone">
+        android:id="@+id/tableScroll"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        android:padding="16dp">
 
 		<TableLayout
-			android:id="@+id/tableLayout"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:stretchColumns="*"
-			android:padding="8dp" />
+            android:id="@+id/tableLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:stretchColumns="*"
+            android:background="#F5F7FA" />
 	</ScrollView>
 
-	<TextView
-		android:id="@+id/statusText"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:textColor="#FFFFFF"
-		android:layout_alignParentTop="true"
-		android:layout_margin="16dp" />
+	<!-- Центрированный контент: статус, код и QR -->
+	<FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:foregroundGravity="center">
 
-	<TextView
-		android:id="@+id/pairCode"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:textColor="#FFFFFF"
-		android:textSize="48sp"
-		android:layout_centerInParent="true"
-		android:visibility="gone" />
+		<LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_gravity="center"
+            android:padding="16dp"
+            android:spacing="32dp">
 
-	<ImageView
-		android:id="@+id/qrImage"
-		android:layout_width="200dp"
-		android:layout_height="200dp"
-		android:layout_alignParentBottom="true"
-		android:layout_margin="16dp"
-		android:visibility="gone" />
+			<!-- Статус + Код -->
+			<LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:spacing="12dp">
 
-</RelativeLayout>
+				<TextView
+                    android:id="@+id/statusText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#FFFFFF"
+                    android:textSize="36sp"
+                    android:textStyle="bold"
+                    android:textAlignment="center"
+                    android:gravity="center" />
+
+				<TextView
+                    android:id="@+id/pairCode"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="000000"
+                    android:textColor="#FFFFFF"
+                    android:textSize="72sp"
+                    android:textStyle="bold"
+                    android:gravity="center"
+                    android:visibility="visible"/>
+			</LinearLayout>
+
+			<!-- QR-код -->
+			<FrameLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="#FFFFFF"
+                android:padding="8dp"
+                android:layout_marginStart="32dp"
+                android:clipToOutline="true">
+
+				<ImageView
+                    android:id="@+id/qrImage"
+                    android:layout_width="300dp"
+                    android:layout_height="300dp"
+                    android:scaleType="fitCenter" />
+			</FrameLayout>
+		</LinearLayout>
+	</FrameLayout>
+</FrameLayout>
