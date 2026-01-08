@@ -1,9 +1,10 @@
 ﻿using System.Net;
+using System.Net.Http;
 using System.Text;
 using System.Text.Json;
 using AdControl.Protos;
 
-namespace AdControl.ScreenClient.Services;
+namespace AdControl.ScreenClient.Core.Services;
 
 public class ConfigItemDto : IEquatable<ConfigItemDto>
 {
@@ -103,7 +104,7 @@ public class PollingService
     private readonly AvaloniaLogicService.AvaloniaLogicServiceClient _avaloniaClient;
     private readonly IHttpClientFactory _http;
 
-    public PollingService(IHttpClientFactory http, AvaloniaLogicService.AvaloniaLogicServiceClient avaloniaClient)
+    public PollingService(IHttpClientFactory http, AvaloniaLogicService.AvaloniaLogicServiceClient avaloniaClient = null)
     {
         _http = http;
         _avaloniaClient = avaloniaClient;

@@ -1,8 +1,6 @@
-using System;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
-using LibVLCSharp.Shared;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace AdControl.ScreenClient;
@@ -13,7 +11,7 @@ public partial class App : Application
 
     public override void Initialize()
     {
-        Core.Initialize();
+        LibVLCSharp.Shared.Core.Initialize();
         AvaloniaXamlLoader.Load(this);
     }
 

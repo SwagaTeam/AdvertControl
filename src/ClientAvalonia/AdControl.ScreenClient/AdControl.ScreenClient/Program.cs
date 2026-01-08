@@ -1,6 +1,10 @@
 ﻿using System;
 using System.Net.Http;
 using AdControl.Protos;
+using AdControl.ScreenClient.Core.Options;
+using AdControl.ScreenClient.Core.Services;
+using AdControl.ScreenClient.Core.Services.Abstractions;
+using AdControl.ScreenClient.Options;
 using AdControl.ScreenClient.Services;
 using Avalonia;
 using Grpc.Net.Client;
@@ -59,7 +63,6 @@ internal class Program
                     var handler = new SocketsHttpHandler
                     {
                         EnableMultipleHttp2Connections = true
-                        // НИКАКИХ кастомных callbacks
                     };
 
                     return GrpcChannel.ForAddress(avaloniaUrl, new GrpcChannelOptions
@@ -68,14 +71,12 @@ internal class Program
                     });
                 });
 
-
                 services.AddSingleton(sp =>
                     new AvaloniaLogicService.AvaloniaLogicServiceClient(sp.GetRequiredService<GrpcChannel>()));
 
-                // Регистрация PollingClient (код из примера)
+                services.AddSingleton<IAppPaths, DesktopAppPaths>();
                 services.AddSingleton<PollingService>();
-
-                // Можно зарегистрировать MainWindow если хочешь: services.AddTransient<MainWindow>();
+                services.AddSingleton<IFileCacheService, FileCacheService>();
             });
     }
 

@@ -1,4 +1,4 @@
 <resources>
-    <string name="app_name">AdControl.ScreenClient.Android</string>
-    <string name="app_text">Hello, Android!</string>
+    <string name="app_name">AdvertControl</string>
+    <string name="app_text">Hello</string>
 </resources>

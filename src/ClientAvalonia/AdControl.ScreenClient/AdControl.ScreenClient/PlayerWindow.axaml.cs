@@ -1,7 +1,5 @@
-using System.Dynamic;
-using System.Text.Json;
-using AdControl.ScreenClient.Enums;
-using AdControl.ScreenClient.Services;
+using AdControl.ScreenClient.Core.Services;
+using AdControl.ScreenClient.Core.Services.Abstractions;
 using AdControl.ScreenClient.Services;
 using Avalonia.Controls;
 using Avalonia.Threading;
@@ -26,7 +24,10 @@ namespace AdControl.ScreenClient
             var httpFactory = App.Services?.GetService<IHttpClientFactory>()
                       ?? throw new InvalidOperationException("IHttpClientFactory not registered in DI");
 
-            _player = new PlayerService(VideoViewControl, ImageControl, JsonTable, httpFactory);
+            var fileCacheService = App.Services?.GetService<IFileCacheService>()
+                      ?? throw new InvalidOperationException("IFileCacheService not registered in DI");
+
+            _player = new PlayerService(VideoViewControl, ImageControl, JsonTable, httpFactory, fileCacheService);
 
             DataContext = this;
             this.startIndex = startIndex - 1 % _items.Count;
@@ -67,7 +68,7 @@ namespace AdControl.ScreenClient
                             await _player.ShowImageAsync(item, token);
                             break;
                         case "InlineJson":
-                            var rows = await GetDynamicListFromJson(item.InlineData);
+                            var rows = await ParsingHelper.GetDynamicListFromJson(item.InlineData);
                             if (rows != null)
                                 await _player.ShowTableAsync(rows, item.DurationSeconds, token);
                             break;
@@ -79,40 +80,6 @@ namespace AdControl.ScreenClient
                     }
                 }
             }
-        }
-        
-        private async Task<List<ExpandoObject>?> GetDynamicListFromJson(string json)
-        {
-            //if (!File.Exists(json))
-            //    return null;
-
-            //var json = await File.ReadAllTextAsync(jsonPath);
-
-            var rows = JsonSerializer.Deserialize<List<Dictionary<string, JsonElement>>>(json);
-            if (rows is null || rows.Count == 0)
-                return null;
-
-            var list = new List<ExpandoObject>();
-            foreach (var dict in rows)
-            {
-                var exp = new ExpandoObject() as IDictionary<string, object?>;
-                foreach (var pair in dict)
-                {
-                    object? value = pair.Value.ValueKind switch
-                    {
-                        JsonValueKind.String => pair.Value.GetString(),
-                        JsonValueKind.Number => pair.Value.TryGetDecimal(out var d) ? d : pair.Value.GetRawText(),
-                        JsonValueKind.True => true,
-                        JsonValueKind.False => false,
-                        _ => null
-                    };
-                    exp[pair.Key] = value;
-                }
-
-                list.Add((ExpandoObject)exp);
-            }
-
-            return list;
         }
     }
 }

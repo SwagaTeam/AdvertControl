@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AdControl.Protos", "..\..\S
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AdControl.ScreenClient.Android", "AdControl.ScreenClient.Android\AdControl.ScreenClient.Android.csproj", "{B1C0808C-F77E-EDBD-5FFA-FB0258EE29F9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AdControl.ScreenClient.Core", "AdControl.ScreenClient.Core\AdControl.ScreenClient.Core.csproj", "{6E9E0D93-E3F2-4987-A06B-618BDB94D971}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -77,6 +79,22 @@ Global
 		{B1C0808C-F77E-EDBD-5FFA-FB0258EE29F9}.Release|x86.ActiveCfg = Release|Any CPU
 		{B1C0808C-F77E-EDBD-5FFA-FB0258EE29F9}.Release|x86.Build.0 = Release|Any CPU
 		{B1C0808C-F77E-EDBD-5FFA-FB0258EE29F9}.Release|x86.Deploy.0 = Release|Any CPU
+		{6E9E0D93-E3F2-4987-A06B-618BDB94D971}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6E9E0D93-E3F2-4987-A06B-618BDB94D971}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6E9E0D93-E3F2-4987-A06B-618BDB94D971}.Debug|ARM64.ActiveCfg = Debug|Any CPU
+		{6E9E0D93-E3F2-4987-A06B-618BDB94D971}.Debug|ARM64.Build.0 = Debug|Any CPU
+		{6E9E0D93-E3F2-4987-A06B-618BDB94D971}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{6E9E0D93-E3F2-4987-A06B-618BDB94D971}.Debug|x64.Build.0 = Debug|Any CPU
+		{6E9E0D93-E3F2-4987-A06B-618BDB94D971}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{6E9E0D93-E3F2-4987-A06B-618BDB94D971}.Debug|x86.Build.0 = Debug|Any CPU
+		{6E9E0D93-E3F2-4987-A06B-618BDB94D971}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6E9E0D93-E3F2-4987-A06B-618BDB94D971}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6E9E0D93-E3F2-4987-A06B-618BDB94D971}.Release|ARM64.ActiveCfg = Release|Any CPU
+		{6E9E0D93-E3F2-4987-A06B-618BDB94D971}.Release|ARM64.Build.0 = Release|Any CPU
+		{6E9E0D93-E3F2-4987-A06B-618BDB94D971}.Release|x64.ActiveCfg = Release|Any CPU
+		{6E9E0D93-E3F2-4987-A06B-618BDB94D971}.Release|x64.Build.0 = Release|Any CPU
+		{6E9E0D93-E3F2-4987-A06B-618BDB94D971}.Release|x86.ActiveCfg = Release|Any CPU
+		{6E9E0D93-E3F2-4987-A06B-618BDB94D971}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,13 +1,61 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/root"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-    <TextView 
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:text="@string/app_text"
-    />
+    android:layout_height="match_parent"
+    android:background="#000000">
+
+	<VideoView
+		android:id="@+id/videoView"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:visibility="gone" />
+
+	<ImageView
+		android:id="@+id/imageView"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:scaleType="centerCrop"
+		android:visibility="gone" />
+
+	<!-- Таблица (скроллируемая) -->
+	<ScrollView
+		android:id="@+id/tableScroll"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:visibility="gone">
+
+		<TableLayout
+			android:id="@+id/tableLayout"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:stretchColumns="*"
+			android:padding="8dp" />
+	</ScrollView>
+
+	<TextView
+		android:id="@+id/statusText"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:textColor="#FFFFFF"
+		android:layout_alignParentTop="true"
+		android:layout_margin="16dp" />
+
+	<TextView
+		android:id="@+id/pairCode"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:textColor="#FFFFFF"
+		android:textSize="48sp"
+		android:layout_centerInParent="true"
+		android:visibility="gone" />
+
+	<ImageView
+		android:id="@+id/qrImage"
+		android:layout_width="200dp"
+		android:layout_height="200dp"
+		android:layout_alignParentBottom="true"
+		android:layout_margin="16dp"
+		android:visibility="gone" />
+
 </RelativeLayout>

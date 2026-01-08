@@ -37,6 +37,7 @@
   </ItemGroup>
 	<ItemGroup>
     <ProjectReference Include="..\..\..\Server\AdControl.Protos\AdControl.Protos.csproj" />
+    <ProjectReference Include="..\AdControl.ScreenClient.Core\AdControl.ScreenClient.Core.csproj" />
   </ItemGroup>
   <ItemGroup>
     <AvaloniaUILicenseKey Include="avln_on_key:v1:796b878acd8e4386a4f16fb0f1ee83f0" />

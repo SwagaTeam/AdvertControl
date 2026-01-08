@@ -5,6 +5,8 @@ using System.Drawing.Imaging;
 using System.Dynamic;
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using AdControl.ScreenClient.Core.Services;
+using AdControl.ScreenClient.Core.Services.Abstractions;
 using AdControl.ScreenClient.Enums;
 using AdControl.ScreenClient.Services;
 using Avalonia.Controls;
@@ -37,7 +39,10 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         var httpFactory = App.Services?.GetService<IHttpClientFactory>()
                       ?? throw new InvalidOperationException("IHttpClientFactory not registered in DI");
 
-        _player = new PlayerService(VideoViewControl, ImageControl, JsonTable, httpFactory);
+        var fileCacheService = App.Services?.GetService<IFileCacheService>()
+          ?? throw new InvalidOperationException("IFileCacheService not registered in DI");
+
+        _player = new PlayerService(VideoViewControl, ImageControl, JsonTable, httpFactory, fileCacheService);
 
         _polling = App.Services?.GetRequiredService<PollingService>()
                    ?? throw new InvalidOperationException("PollingService not found");
@@ -241,41 +246,6 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             }   
         }
     }
-
-    private async Task<List<ExpandoObject>?> GetDynamicListFromJson(string json)
-    {
-        //if (!File.Exists(json))
-        //    return null;
-
-        //var json = await File.ReadAllTextAsync(jsonPath);
-
-        var rows = JsonSerializer.Deserialize<List<Dictionary<string, JsonElement>>>(json);
-        if (rows is null || rows.Count == 0)
-            return null;
-
-        var list = new List<ExpandoObject>();
-        foreach (var dict in rows)
-        {
-            var exp = new ExpandoObject() as IDictionary<string, object?>;
-            foreach (var pair in dict)
-            {
-                object? value = pair.Value.ValueKind switch
-                {
-                    JsonValueKind.String => pair.Value.GetString(),
-                    JsonValueKind.Number => pair.Value.TryGetDecimal(out var d) ? d : pair.Value.GetRawText(),
-                    JsonValueKind.True => true,
-                    JsonValueKind.False => false,
-                    _ => null
-                };
-                exp[pair.Key] = value;
-            }
-
-            list.Add((ExpandoObject)exp);
-        }
-
-        return list;
-    }
-
     public async Task StartLoopAsync(CancellationToken token)
     {
         try
@@ -400,7 +370,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                         break;
 
                     case "InlineJson":
-                        var rows = await GetDynamicListFromJson(item.InlineData);
+                        var rows = await ParsingHelper.GetDynamicListFromJson(item.InlineData);
                         if (rows != null)
                             await _player.ShowTableAsync(rows, item.DurationSeconds, token);
                         break;
@@ -545,20 +515,15 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
         try
         {
-            // Выполняем тяжелую работу в Task.Run чтобы не блокировать UI
             var pngBytes = await Task.Run(() =>
             {
                 using var qrGen = new QRCodeGenerator();
                 using var data = qrGen.CreateQrCode(url, QRCodeGenerator.ECCLevel.Q);
-                using var qr = new QRCode(data);
-                using var bmp = qr.GetGraphic(20); // возвращает System.Drawing.Bitmap
 
-                using var ms = new MemoryStream();
-                bmp.Save(ms, ImageFormat.Png);
-                return ms.ToArray();
+                var pngQr = new PngByteQRCode(data);
+                return pngQr.GetGraphic(20);
             }, cancellationToken);
 
-            // Устанавливаем картинку в UI
             await Dispatcher.UIThread.InvokeAsync(() =>
             {
                 try
@@ -583,6 +548,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             await Dispatcher.UIThread.InvokeAsync(() => QrImage.Source = null);
         }
     }
+
 
     /// <summary>
     /// Обновляет UI: текст кода и генерирует QR.

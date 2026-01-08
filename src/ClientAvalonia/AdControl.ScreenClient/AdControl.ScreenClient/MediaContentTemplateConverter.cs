@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using AdControl.ScreenClient.Core.Services;
 using AdControl.ScreenClient.Services;
 using Avalonia;
 using Avalonia.Data.Converters;

@@ -3,6 +3,8 @@ using System.IO;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using AdControl.ScreenClient.Core.Services;
+using AdControl.ScreenClient.Core.Services.Abstractions;
 using Avalonia.Controls;
 using Avalonia.Data;
 using Avalonia.Media.Imaging;
@@ -21,9 +23,10 @@ public class PlayerService : IDisposable
     private readonly MediaPlayer _mediaPlayer;
     private readonly VideoView _videoView;
     private readonly IHttpClientFactory _httpFactory;
+    private readonly IFileCacheService _fileCacheService;
     private readonly string _cacheDir;
 
-    public PlayerService(VideoView videoView, Image imageControl, DataGrid jsonTable, IHttpClientFactory httpFactory)
+    public PlayerService(VideoView videoView, Image imageControl, DataGrid jsonTable, IHttpClientFactory httpFactory, IFileCacheService fileCacheService)
     {
         _videoView = videoView;
         _imageControl = imageControl;
@@ -37,6 +40,7 @@ public class PlayerService : IDisposable
 
         _cacheDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "AdControl", "cache");
         Directory.CreateDirectory(_cacheDir);
+        _fileCacheService=fileCacheService;
     }
 
     public void Dispose()
@@ -73,7 +77,7 @@ public class PlayerService : IDisposable
 
     public async Task ShowVideoAsync(string fileName, string? checksum, int durationSeconds, CancellationToken token)
     {
-        var localPath = await GetCachedFilePathAsync(fileName, checksum, token);
+        var localPath = await _fileCacheService.GetCachedFilePathAsync(fileName, checksum, token);
 
         await Dispatcher.UIThread.InvokeAsync(() =>
         {
@@ -99,7 +103,7 @@ public class PlayerService : IDisposable
 
     public async Task ShowImageAsync(string fileName, string? checksum, int durationSeconds, CancellationToken token, bool isMainWindow = true)
     {
-        var localPath = await GetCachedFilePathAsync(fileName, checksum, token);
+        var localPath = await _fileCacheService.GetCachedFilePathAsync(fileName, checksum, token);
 
         await Dispatcher.UIThread.InvokeAsync(() =>
         {
@@ -147,50 +151,5 @@ public class PlayerService : IDisposable
         _videoView.IsVisible = visible == _videoView;
         _imageControl.IsVisible = visible == _imageControl;
         _jsonTable.IsVisible = visible == _jsonTable;
-    }
-
-    private async Task<string> GetCachedFilePathAsync(string fileName, string? checksum, CancellationToken token)
-    {
-        // Determine extension and cache file name
-        var ext = Path.GetExtension(fileName);
-        if (string.IsNullOrEmpty(ext))
-            ext = ".bin";
-
-        var key = !string.IsNullOrEmpty(checksum) ? checksum : Path.GetFileNameWithoutExtension(fileName);
-        var cached = Path.Combine(_cacheDir, key + ext);
-
-        if (File.Exists(cached))
-            return cached;
-
-        // download
-        var client = _httpFactory.CreateClient("gateway"); // optional named client
-        var encoded = Uri.EscapeDataString(fileName);
-        var url = GatewayBaseUrl + encoded;
-
-        var tmp = Path.Combine(_cacheDir, Guid.NewGuid().ToString() + ext);
-        using (var resp = await client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, token))
-        {
-            resp.EnsureSuccessStatusCode();
-            using var src = await resp.Content.ReadAsStreamAsync(token);
-            using var dst = File.Create(tmp);
-            await src.CopyToAsync(dst, token);
-        }
-
-        // atomic move
-        try
-        {
-            File.Move(tmp, cached);
-        }
-        catch
-        {
-            if (File.Exists(tmp))
-            {
-                try
-                { File.Delete(tmp); }
-                catch { }
-            }
-        }
-
-        return cached;
     }
 }
