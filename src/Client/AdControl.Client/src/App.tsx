@@ -8,13 +8,15 @@ import {ProfileScreen} from "./components/ProfileScreen/ProfileScreen.tsx";
 import {SignageCreatorPage} from './components/SignageCreatorPage/SignageCreatorPage.tsx'
 import {ScreenDetail} from "./components/ScreenDetailPage/ScreenDetailPage.tsx";
 import {SettingsPage} from "./components/SettingsPage.tsx";
+import {LandingPage} from "./components/LandingPage/LandingPage.tsx"
 
 export default function App() {
     return (
         <Router>
             <Routes>
                 <Route path="/login" element={<LoginPage />} />
-                <Route path="/" element={<MainLayout />} >
+                <Route path="/" element={<LandingPage />} />
+                <Route path="/crm" element={<MainLayout />} >
                     <Route index element={<DashboardPage />} />
                     <Route path="dashboard" element={<DashboardPage />} />
                     <Route path="screens" element={<ScreensPage />} />
@@ -25,8 +27,6 @@ export default function App() {
                     <Route path="screen/:id/config" element={<SignageCreatorPage />} />
                     <Route path="screen/:id/config/edit" element={<SignageCreatorPage />} />
                 </Route>
-
-                <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
         </Router>
     );

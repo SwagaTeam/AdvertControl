@@ -128,10 +128,10 @@ export function Header({ isMinimal = false }: { isMinimal?: boolean }) {
                     <DropdownMenuContent align="end" className="w-48">
                       <DropdownMenuLabel>Мой аккаунт</DropdownMenuLabel>
                       <DropdownMenuSeparator />
-                      <DropdownMenuItem onClick={() => navigate("/profile")}>
+                      <DropdownMenuItem onClick={() => navigate("profile")}>
                         Профиль
                       </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => navigate("/settings")}>Настройки</DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => navigate("settings")}>Настройки</DropdownMenuItem>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem
                           className="text-red-600"
