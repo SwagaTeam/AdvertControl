@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { 
+import {
   Play,
   ArrowRight,
 } from 'lucide-react';
@@ -8,9 +8,14 @@ import { StepCard } from './StepCard';
 import { ImageWithFallback } from './ImageWithFallback';
 import "./index.css"
 import { useNavigate } from 'react-router-dom';
+import { Header } from '../layouts/Header';
+import {useSelector} from "react-redux";
+
+
 
 export const LandingPage = () => {
     const navigate = useNavigate();
+    const { token } = useSelector((state: any) => state.auth);
 
   const steps = [
     {
@@ -30,6 +35,7 @@ export const LandingPage = () => {
 
   return (
     <div className="min-h-screen bg-white">
+      <Header />
       {/* Hero Section - Full Screen with Advanced Animations */}
       <section className="relative h-screen flex items-center justify-center overflow-hidden">
     {/* Animated Background - Теперь на всю секцию */}
@@ -63,7 +69,7 @@ export const LandingPage = () => {
             }}
             className="absolute bottom-0 right-0 w-[600px] h-[600px] bg-[#1d4ed8] rounded-full blur-3xl opacity-20"
           />
-          
+
           {/* Grid Pattern */}
           <div className="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:14px_24px]"></div>
         </div>
@@ -119,7 +125,7 @@ export const LandingPage = () => {
                 transition={{ duration: 0.8, delay: 0.9 }}
                 className="text-xl text-gray-600 mb-8 leading-relaxed"
               >
-                Современная платформа для удаленного управления цифровыми экранами. 
+                Современная платформа для удаленного управления цифровыми экранами.
                 Создавайте, планируйте и показывайте контент на тысячах устройств одновременно.
               </motion.p>
 
@@ -134,7 +140,7 @@ export const LandingPage = () => {
                   whileTap={{ scale: 0.95 }}
                 >
                   <Button variant="primary" className="flex items-center gap-2 group"
-                  onClick={() => navigate("/login")}>
+                  onClick={() => token ? navigate("/crm") : navigate("/login") }>
                     Перейти в CRM
                     <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                   </Button>
@@ -172,9 +178,9 @@ export const LandingPage = () => {
                 </div>
               </motion.div>
             </motion.div>
-            
+
             <motion.div
-            animate={{ 
+            animate={{
                 y: [0, -40, 0],
             }}
             transition={{
@@ -222,7 +228,7 @@ export const LandingPage = () => {
 
       {/* How It Works Section */}
       <section className="py-20 bg-white">
-        
+
         <div className="max-w-7xl mx-auto px-6">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -272,12 +278,12 @@ export const LandingPage = () => {
       textAlign: 'center',
     }}
   >
-    <h2 className="text-5xl mb-4 bg-gradient-to-r from-gray-900 via-[#2563EB] to-gray-900 bg-clip-text text-transparent"> 
-        Демо презентация проекта 
+    <h2 className="text-5xl mb-4 bg-gradient-to-r from-gray-900 via-[#2563EB] to-gray-900 bg-clip-text text-transparent">
+        Демо презентация проекта
     </h2>
 
-    <p className="text-xl text-gray-600 max-w-2xl mx-auto mb-8"> 
-        Современный дизайн и гибкость для любых сценариев 
+    <p className="text-xl text-gray-600 max-w-2xl mx-auto mb-8">
+        Современный дизайн и гибкость для любых сценариев
     </p>
 
     {/* Видео */}
@@ -317,7 +323,7 @@ export const LandingPage = () => {
           <div className="absolute top-0 left-0 w-96 h-96 bg-white rounded-full blur-3xl"></div>
           <div className="absolute bottom-0 right-0 w-96 h-96 bg-white rounded-full blur-3xl"></div>
         </div>
-        
+
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -341,34 +347,34 @@ export const LandingPage = () => {
           <div className="grid md:grid-cols-4 gap-8 mb-8">
             <div>
               <div className="flex items-center gap-2 mb-4">
-                <img src="./icon.ico" className="w-5 h-5 text-white" />
+                <img alt="Логотип AdvertControl" src="/icon.ico" className="w-5 h-5 text-white" />
                 <span className="text-white text-xl">AdvertControl</span>
               </div>
               <p className="text-sm text-gray-400">
                 Современное решение для управления рекламными экранами
               </p>
             </div>
-            
+
             <div>
               <h4 className="text-white mb-4">Продукт</h4>
               <ul className="space-y-2 text-sm">
-                <li><a href="#" className="hover:text-white transition-colors">О сервисе</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Тарифы</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Функции</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Обновления</a></li>
+                <li><a className="hover:text-white transition-colors">О сервисе</a></li>
+                <li><a className="hover:text-white transition-colors">Тарифы</a></li>
+                <li><a className="hover:text-white transition-colors">Функции</a></li>
+                <li><a className="hover:text-white transition-colors">Обновления</a></li>
               </ul>
             </div>
-            
+
             <div>
               <h4 className="text-white mb-4">Поддержка</h4>
               <ul className="space-y-2 text-sm">
-                <li><a href="#" className="hover:text-white transition-colors">Документация</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">API</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Помощь</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Контакты</a></li>
+                <li><a className="hover:text-white transition-colors">Документация</a></li>
+                <li><a className="hover:text-white transition-colors">API</a></li>
+                <li><a className="hover:text-white transition-colors">Помощь</a></li>
+                <li><a className="hover:text-white transition-colors">Контакты</a></li>
               </ul>
             </div>
-            
+
             <div>
               <h4 className="text-white mb-4">Контакты</h4>
               <ul className="space-y-2 text-sm">
@@ -377,12 +383,12 @@ export const LandingPage = () => {
               </ul>
             </div>
           </div>
-          
+
           <div className="pt-8 border-t border-gray-800 text-center text-sm text-gray-400">
-            <p>© 2026 AdvertControl. Все права защищены.</p>
+            <p>© 2026 AdvertControl. СВАГА</p>
           </div>
         </div>
       </footer>
     </div>
   );
-}
+};
