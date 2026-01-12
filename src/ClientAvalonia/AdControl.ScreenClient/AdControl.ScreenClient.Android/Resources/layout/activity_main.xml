@@ -85,7 +85,6 @@
 			<FrameLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="#FFFFFF"
                 android:padding="8dp"
                 android:layout_marginStart="32dp"
                 android:clipToOutline="true">

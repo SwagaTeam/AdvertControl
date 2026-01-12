@@ -1,5 +1,4 @@
 ﻿using System.Net;
-using System.Net.Http;
 using System.Text;
 using AdControl.Protos;
 using Newtonsoft.Json;
@@ -210,22 +209,30 @@ public class PollingService
     public async Task<bool> StartPairAsync(string tempDisplayId, string code, int ttlMinutes = 10, string? info = null)
     {
         var client = _http.CreateClient("gateway");
-        var payload = new
+
+        var jo = new JObject
         {
-            TempDisplayId = tempDisplayId,
-            Code = code,
-            TtlMinutes = ttlMinutes,
-            Info = info
+            ["tempDisplayId"] = tempDisplayId ?? "",
+            ["code"] = code ?? "",
+            ["ttlMinutes"] = ttlMinutes
         };
-        var json = JsonConvert.SerializeObject(payload);
+
+        if (!string.IsNullOrEmpty(info))
+            jo["info"] = info;
+
+        var json = jo.ToString(Formatting.None);
+
+        System.Diagnostics.Debug.WriteLine("StartPair JSON: " + json);
+
         using var content = new StringContent(json, Encoding.UTF8, "application/json");
         try
         {
             using var resp = await client.PostAsync("/api/polling/pair/start", content);
             return resp.IsSuccessStatusCode;
         }
-        catch
+        catch (Exception ex)
         {
+            System.Diagnostics.Debug.WriteLine("StartPair error: " + ex);
             return false;
         }
     }

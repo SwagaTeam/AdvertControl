@@ -1,14 +1,11 @@
-using System.Dynamic;
-using System.Xml;
 using AdControl.ScreenClient.Android.Services;
 using AdControl.ScreenClient.Core.Options;
 using AdControl.ScreenClient.Core.Services;
 using AdControl.ScreenClient.Core.Services.Abstractions;
 using Android.Views;
+using Newtonsoft.Json.Linq;
 using Graphics = Android.Graphics;
 using OperationCanceledException = Android.OS.OperationCanceledException;
-using Newtonsoft.Json.Linq;
-using Newtonsoft.Json;
 
 namespace AdControl.ScreenClient.Android
 {
@@ -131,26 +128,42 @@ namespace AdControl.ScreenClient.Android
             });
         }
 
-        // Парсер inline json -> List<ExpandoObject>
-        private List<ExpandoObject>? ParseInlineJson(string json)
-        {
-            if (string.IsNullOrWhiteSpace(json))
-                return null;
+        //// Парсер inline json -> List<ExpandoObject>
+        //private List<InlineTableRow>? ParseInlineJson(string json)
+        //{
+        //    if (string.IsNullOrWhiteSpace(json))
+        //        return null;
 
-            var rows = JsonConvert.DeserializeObject<List<Dictionary<string, object>>>(json);
-            if (rows == null || rows.Count == 0)
-                return null;
+        //    // десериализуем в List<Dictionary<string, object?>> напрямую
+        //    var rows = JsonConvert.DeserializeObject<List<Dictionary<string, object?>>>(json);
+        //    if (rows == null || rows.Count == 0)
+        //        return null;
 
-            var list = new List<ExpandoObject>();
-            foreach (var dict in rows)
-            {
-                var exp = new ExpandoObject() as IDictionary<string, object?>;
-                foreach (var pair in dict)
-                    exp[pair.Key] = pair.Value;
-                list.Add((ExpandoObject)exp);
-            }
-            return list;
-        }
+        //    var list = new List<InlineTableRow>();
+        //    foreach (var dict in rows)
+        //    {
+        //        var row = new InlineTableRow();
+        //        foreach (var kv in dict)
+        //        {
+        //            if (kv.Value == null)
+        //                continue;
+
+        //            // нормализуем ключ
+        //            var key = kv.Key.Trim().ToLowerInvariant();
+
+        //            // проверка на дубликаты
+        //            var suffix = 1;
+        //            var baseKey = key;
+        //            while (row.Cells.ContainsKey(key))
+        //                key = baseKey + "_" + suffix++;
+
+        //            row.Cells[key] = kv.Value;
+        //        }
+        //        list.Add(row);
+        //    }
+        //    return list;
+        //}
+
 
 
         // Основной цикл показа (аналог StartLoopAsync + ShowItemsAsync)
@@ -194,7 +207,6 @@ namespace AdControl.ScreenClient.Android
         {
             try
             {
-                RunOnUiThread(() => _statusText.Text = "Обращение к серверу...");
                 var cfg = await _polling.GetConfigAsync(_screenId, _knownVersion);
 
                 if (cfg == null)
@@ -261,11 +273,11 @@ namespace AdControl.ScreenClient.Android
                         case "Image":
                         await _player.ShowImageAsync(item, token);
                         break;
-                        case "InlineJson":
-                        var rows = ParseInlineJson(item.InlineData);
-                        if (rows != null)
-                            await _player.ShowTableAsync(rows, item.DurationSeconds, token);
-                        break;
+                        //case "InlineJson":
+                        //var rows = ParseInlineJson(item.InlineData);
+                        //if (rows != null)
+                            //await _player.ShowTableAsync(rows, item.DurationSeconds, token);
+                       // break;
                     }
 
                     if (_isStatic)
@@ -320,7 +332,7 @@ namespace AdControl.ScreenClient.Android
                 }
                 catch (Exception ex)
                 {
-                    RunOnUiThread(() => _statusText.Text = $"Ошибка привязки: {ex.Message}");
+                    RunOnUiThread(() => _statusText.Text = $"Ошибка привязки: {ex.Message} {ex.InnerException} {ex}");
                 }
 
                 // Ждём 5 минут перед новой попыткой, как в desktop-логике
