@@ -39,9 +39,9 @@ import { generateRandomPassword } from "../utils";
 /* ===================== TYPES ===================== */
 
 type ApiUser = {
-    id: string;
+    userId: string;
     username: string;
-    roles: string[];
+    role: string;
     email: string;
     emailVerified: boolean;
     firstName: string;
@@ -111,8 +111,8 @@ export function UsersPage() {
     const fetchUsers = async () => {
         try {
             setIsLoadingUsers(true);
-            const { data } = await apiClient.post<ApiUser[]>("/auth/get-users");
-            setUsers(data);
+            const { data } = await apiClient.post<{users: ApiUser[]}>("/auth/get-users");
+            setUsers(data.users);
         } catch (e) {
             console.error(e);
         } finally {
@@ -165,17 +165,18 @@ export function UsersPage() {
         navigator.clipboard.writeText(text);
     };
 
-    const filteredUsers = users.filter(
-        (u) =>
+    const filteredUsers = Array.isArray(users)
+        ? users.filter((u) =>
             u.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
             (u.email ?? "").toLowerCase().includes(searchTerm.toLowerCase())
-    );
+        )
+        : [];
 
-    const getRoleBadge = (roles: string[]) =>
-        roles.includes("admin") ? (
-            <Badge className="bg-purple-100 text-purple-800">Администратор</Badge>
-        ) : (
+    const getRoleBadge = (role: string) =>
+        role === "user" ? (
             <Badge className="bg-blue-100 text-blue-800">Пользователь</Badge>
+        ) : (
+            <Badge className="bg-purple-100 text-purple-800">Администратор</Badge>
         );
 
     const getStatusBadge = (enabled: boolean) =>
@@ -344,6 +345,8 @@ export function UsersPage() {
                         <TableHeader>
                             <TableRow>
                                 <TableHead>Пользователь</TableHead>
+                                <TableHead>Имя</TableHead>
+                                <TableHead>Фамилия</TableHead>
                                 <TableHead>Email</TableHead>
                                 <TableHead>Роль</TableHead>
                                 <TableHead>Статус</TableHead>
@@ -358,7 +361,7 @@ export function UsersPage() {
                                     u.username.slice(0, 2).toUpperCase();
 
                                 return (
-                                    <TableRow key={u.id}>
+                                    <TableRow key={u.userId}>
                                         <TableCell>
                                             <div className="flex items-center gap-3">
                                                 <Avatar className="h-8 w-8">
@@ -369,14 +372,16 @@ export function UsersPage() {
                                                 {u.username}
                                             </div>
                                         </TableCell>
+                                        <TableCell>{u.firstName || "—"}</TableCell>
+                                        <TableCell>{u.lastName || "—"}</TableCell>
                                         <TableCell>{u.email || "—"}</TableCell>
-                                        <TableCell>{getRoleBadge(u.roles)}</TableCell>
+                                        <TableCell>{getRoleBadge(u.role)}</TableCell>
                                         <TableCell>
                                             {getStatusBadge(u.enabled)}
                                         </TableCell>
                                         <TableCell className="text-right">
                                             <Button variant="ghost" size="sm">
-                                                Редактировать
+                                                Перейти
                                             </Button>
                                         </TableCell>
                                     </TableRow>
