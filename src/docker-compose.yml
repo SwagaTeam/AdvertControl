@@ -53,7 +53,10 @@ services:
 
   adcontrol-auth:
     container_name: adcontrol-auth
-    image: hub.66bit.ru/urfu-2025/advertising-screen-management-system/adcontrol-auth:latest
+    build:
+      context: .
+      dockerfile: ./Server/AdControl.Auth/Dockerfile
+      target: dev
     healthcheck:
       disable: true
     environment:
@@ -82,7 +85,10 @@ services:
 
   adcontrol-web:
     container_name: adcontrol-web
-    image: hub.66bit.ru/urfu-2025/advertising-screen-management-system/adcontrol-web:latest
+    build:
+      context: .
+      dockerfile: ./Server/AdControl.Web/AdControl.Web/Dockerfile
+      target: dev
     healthcheck:
       disable: true
     environment:
@@ -109,7 +115,9 @@ services:
 
   adcontrol-avalonia-logic:
     container_name: adcontrol-avalonia-logic
-    image: hub.66bit.ru/urfu-2025/advertising-screen-management-system/adcontrol-avalonia-logic:latest
+    build:
+      context: .
+      dockerfile: Server/AdControl.Avalonia.Logic/AdControl.Avalonia.Logic/Dockerfile
     environment:
       - Redis__Url=redis:6379
       - ASPNETCORE_URLS=http://+:5002
@@ -135,7 +143,9 @@ services:
 
   adcontrol-gateway:
     container_name: adcontrol-gateway
-    image: hub.66bit.ru/urfu-2025/advertising-screen-management-system/adcontrol-gateway:latest
+    build:
+      context: .
+      dockerfile: Server/AdControl.Gateway/AdControl.Gateway/Dockerfile
     environment:
       - Grpc__ScreenService=https://adcontrol-web:5001
       - Grpc__AvaloniaLogicService=https://adcontrol-avalonia-logic:5002
