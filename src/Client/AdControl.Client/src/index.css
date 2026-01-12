@@ -2600,3 +2600,40 @@ html {
     transform: translate3d(var(--tw-exit-translate-x, 0), var(--tw-exit-translate-y, 0), 0) scale3d(var(--tw-exit-scale, 1), var(--tw-exit-scale, 1), var(--tw-exit-scale, 1)) rotate(var(--tw-exit-rotate, 0));
   }
 }
+
+.desktop-sidebar {
+  display: none;
+  /* bg-white border-r border-gray-200 transition-all duration-300 */
+  background-color: white;
+  border-right: 1px solid #e5e7eb;
+  transition: all 300ms;
+
+  /* Показан на 1024px+ */
+  @media (min-width: 1024px) {
+    /* lg:flex lg:fixed lg:left-0 lg:top-16 lg:bottom-0 */
+    display: flex;
+    position: fixed;
+    left: 0;
+    top: 4rem; /* top-16 = 4rem */
+    bottom: 0;
+  }
+}
+
+.mobile-navbar {
+  /* flex fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 py-2 z-50 */
+  display: flex;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: white;
+  border-top: 1px solid #e5e7eb;
+  padding: 0.5rem 0; /* py-2 = 0.5rem сверху и снизу */
+  z-index: 50;
+
+  /* Скрыта на 1024px+ */
+  @media (min-width: 1024px) {
+    /* lg:hidden */
+    display: none;
+  }
+}

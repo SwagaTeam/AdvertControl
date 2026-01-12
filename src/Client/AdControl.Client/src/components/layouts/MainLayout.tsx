@@ -17,10 +17,15 @@ export const MainLayout = () => {
             <main
                 className="pt-16 transition-all duration-300 z-0"
                 style={{
-                    marginLeft: "4rem",
+                    marginLeft: window.innerWidth >= 1024 ? (sidebarCollapsed ? "4rem" : "16rem") : "0",
+                    paddingBottom: window.innerWidth < 1024 ? "4rem" : "0",
                 }}
             >
-                <div style={{ padding: "1rem 1.5rem 0 1.5rem "}}><Outlet /></div>
+                <div style={{
+                    padding: window.innerWidth >= 1024 ? "1rem 1.5rem 0 1.5rem" : "1rem 1rem 0 1rem"
+                }}>
+                    <Outlet />
+                </div>
             </main>
         </div>
     );
