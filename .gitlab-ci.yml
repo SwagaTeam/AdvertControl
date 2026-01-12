@@ -191,7 +191,8 @@ deploy-frontend-job:
     - main
   when: on_success
 
-  # Upload Setup.exe to Generic Package Registry
+
+# Upload Setup.exe to Generic Package Registry
 upload-setup:
   stage: release
   image: curlimages/curl:latest
