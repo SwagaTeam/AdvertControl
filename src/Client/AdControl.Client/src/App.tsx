@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route} from "react-router-dom";
 import { DashboardPage } from "./components/DashboardPage";
 import { ScreensPage } from "./components/ScreensPage/ScreensPage.tsx";
 import { TemplatesPage } from "./components/TemplatesPage";
@@ -9,6 +9,7 @@ import {SignageCreatorPage} from './components/SignageCreatorPage/SignageCreator
 import {ScreenDetail} from "./components/ScreenDetailPage/ScreenDetailPage.tsx";
 import {SettingsPage} from "./components/SettingsPage.tsx";
 import {LandingPage} from "./components/LandingPage/LandingPage.tsx"
+import {UsersPage} from "./components/UsersPage.tsx";
 
 export default function App() {
     return (
@@ -22,6 +23,7 @@ export default function App() {
                     <Route path="screens" element={<ScreensPage />} />
                     <Route path="templates" element={<TemplatesPage />} />
                     <Route path="profile" element={<ProfileScreen />} />
+                    <Route path="users" element={<UsersPage />} />
                     <Route path="settings" element={<SettingsPage />} />
                     <Route path="screen/:id" element={<ScreenDetail />} />
                     <Route path="screen/:id/config" element={<SignageCreatorPage />} />
