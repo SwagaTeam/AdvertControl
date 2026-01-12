@@ -182,14 +182,14 @@ public class AuthController : ControllerBase
     [Authorize]
     [ProducesResponseType(typeof(UserInfoResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<IActionResult> GetUsers(string id)
+    public async Task<IActionResult> GetUsers()
     {
         var token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
 
         var requestUserId = new UserIdRequest { Token = token };
         var currentUserId = await _authServiceClient.GetCurrentUserIdAsync(requestUserId);
 
-        if (id != currentUserId.Id)
+        if (currentUserId.Id == "")
             return Unauthorized();
 
         var request = new GetUsersRequest();
