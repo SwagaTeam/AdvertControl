@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Internal;
 
 namespace AdControl.Gateway.Application.Extensions
 {
@@ -11,12 +10,12 @@ namespace AdControl.Gateway.Application.Extensions
                 return null;
 
             var stream = new MemoryStream(bytes);
-            return new FormFile(stream, 0, bytes.Length, "file", fileName)
+
+            return new Microsoft.AspNetCore.Http.Internal.FormFile(stream, 0, bytes.Length, "file", fileName)
             {
                 Headers = new HeaderDictionary(),
                 ContentType = contentType
             };
         }
     }
-
 }
