@@ -34,10 +34,10 @@ export const LandingPage = () => {
 
 
   return (
-    <div className="min-h-screen bg-white">
+      <div className="min-h-screen bg-white overflow-x-hidden flex flex-col">
       <Header />
-      <section className="min-h-screen relative h-screen flex items-center justify-center overflow-hidden">
-    <div className="absolute inset-0 bg-gradient-to-br from-gray-50 via-blue-50 to-white">
+          <section className="flex min-h-screen items-center relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-gray-50 via-blue-50 to-white">
           <motion.div
             animate={{
               scale: [1, 1.2, 1],
@@ -80,47 +80,25 @@ export const LandingPage = () => {
             >
 
               {/* Animated Headline */}
-              <h1 className="text-6xl lg:text-7xl mb-6 leading-[1.1] ">
-                <motion.span
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: 0.2 }}
-                  className="block"
-                >
-                  Управляйте
-                </motion.span>
-                <motion.span
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: 0.4 }}
-                  className="block"
-                >
-                  рекламой на{' '}
-                   <span className="relative inline-block">
-                        <span className="relative z-10 text-[#2563EB] font-semibold">всех экранах</span>
-                        <motion.span
-                        initial={{ scaleX: 0 }}
-                        animate={{ scaleX: 1 }}
-                        transition={{ duration: 0.8, delay: 0.8 }}
-                        className=""
-                        />
-                    </span>
-                </motion.span>
-                <motion.span
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: 0.6 }}
-                  className="block bg-gradient-to-r from-[#2563EB] to-[#1d4ed8] bg-clip-text text-transparent font-semibold"
-                >
-                  из любой точки
-                </motion.span>
-              </h1>
+                <h1 className="landing-heading">
+                    <motion.span className="block">Управляйте</motion.span>
+                    <motion.span className="block">
+                        рекламой на{' '}
+                        <span className="relative inline-block">
+      <span className="relative z-10 text-[#2563EB] font-extrabold">всех экранах</span>
+                            {/* underline анимация если нужно */}
+    </span>
+                    </motion.span>
+                    <motion.span className="block bg-gradient-to-r from-[#2563EB] to-[#1d4ed8] bg-clip-text text-transparent font-extrabold">
+                        из любой точки
+                    </motion.span>
+                </h1>
 
               <motion.p
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.8, delay: 0.9 }}
-                className="text-xl text-gray-600 mb-8 leading-relaxed"
+                className="landing-subheading text-gray-600 mb-8 leading-relaxed"
               >
                 Современная платформа для удаленного управления цифровыми экранами.
                 Создавайте, планируйте и показывайте контент на тысячах устройств одновременно.
@@ -136,7 +114,7 @@ export const LandingPage = () => {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
-                  <Button variant="primary" className="flex items-center gap-2 group"
+                  <Button variant="primary" className="flex items-center gap-2 landing-btn "
                   onClick={() => token ? navigate("/crm") : navigate("/login") }>
                     Перейти в CRM
                     <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
@@ -146,7 +124,7 @@ export const LandingPage = () => {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
-                  <Button variant="secondary" className="flex items-center gap-2"
+                  <Button variant="secondary" className="flex items-center gap-2 landing-btn "
                   onClick={() => {document.getElementById('demo-section')?.scrollIntoView({ behavior: 'smooth' })}}>
                     <Play className="w-5 h-5" />
                     Смотреть демо
@@ -159,7 +137,7 @@ export const LandingPage = () => {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.8, delay: 1.3 }}
-                className="flex flex-wrap gap-8 mt-12"
+                className="flex flex-wrap gap-8 mt-6"
               >
                 <div>
                   <div className="text-3xl text-[#2563EB] mb-1">6</div>
@@ -185,7 +163,7 @@ export const LandingPage = () => {
                 repeat: Infinity,
                 ease: "easeInOut"
             }}
-            className="relative"
+            className="relative hide-on-mobile"
             >
             <ImageWithFallback
                 src="./ad-screen.png"
@@ -196,30 +174,6 @@ export const LandingPage = () => {
             </motion.div>
           </div>
         </div>
-
-
-        {/* Scroll Indicator */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 1, delay: 1.5 }}
-          className="absolute bottom-10 left-1/2 transform -translate-x-1/2"
-        >
-          <motion.div
-            animate={{ y: [0, 10, 0] }}
-            transition={{ duration: 2, repeat: Infinity }}
-            className="flex flex-col items-center gap-2 text-gray-400"
-          >
-            <span className="text-sm">Прокрутите вниз</span>
-            <div className="w-6 h-10 border-2 border-gray-300 rounded-full flex justify-center">
-              <motion.div
-                animate={{ y: [0, 12, 0] }}
-                transition={{ duration: 2, repeat: Infinity }}
-                className="w-1.5 h-1.5 bg-gray-400 rounded-full mt-2"
-              />
-            </div>
-          </motion.div>
-        </motion.div>
       </section>
 
 
@@ -241,7 +195,7 @@ export const LandingPage = () => {
               transition={{ duration: 0.5 }}
               className="inline-block"
             >
-              <h2 className="text-5xl mb-4 bg-gradient-to-r from-gray-900 via-[#2563EB] to-gray-900 bg-clip-text text-transparent">
+              <h2 className="landing-heading mb-4 bg-gradient-to-r from-gray-900 via-[#2563EB] to-gray-900 bg-clip-text text-transparent">
                 Как это работает
               </h2>
             </motion.div>
@@ -275,7 +229,7 @@ export const LandingPage = () => {
       textAlign: 'center',
     }}
   >
-    <h2 className="text-5xl mb-4 bg-gradient-to-r from-gray-900 via-[#2563EB] to-gray-900 bg-clip-text text-transparent">
+    <h2 className="landing-heading mb-4 bg-gradient-to-r from-gray-900 via-[#2563EB] to-gray-900 bg-clip-text text-transparent">
         Демо презентация проекта
     </h2>
 
