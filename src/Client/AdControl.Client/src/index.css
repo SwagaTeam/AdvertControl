@@ -2637,3 +2637,49 @@ html {
     display: none;
   }
 }
+
+.hide-on-mobile {
+  display: flex;
+  @media (max-width: 1024px) {
+    display: none;
+  }
+}
+
+.landing-heading {
+  font-size: 3.5rem;
+  line-height: 1.05;
+  margin-bottom: 1.5rem;
+  letter-spacing: -0.025em;
+}
+
+@media (min-width: 768px) {
+  .landing-heading { font-size: 4rem; }
+}
+
+@media (min-width: 1024px) {
+  .landing-heading {
+    font-size: 5rem;
+    line-height: 1.1;
+  }
+}
+
+.landing-subheading {
+  font-size: 1.2rem;
+  margin-top: -10px;
+}
+
+@media (min-width: 1024px) {
+  .landing-subheading {
+    font-size: 1.25rem;
+    margin-top: -10px;
+  }
+}
+
+.landing-btn {
+  font-size: 0.9rem;
+  padding: 1rem 0.85rem;
+}
+
+@media (min-width: 768px) {
+  .landing-btn { font-size: 1.25rem; }
+}
