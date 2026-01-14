@@ -27,6 +27,7 @@ type DashboardResponse = {
   };
 };
 
+
 export function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [dashboard, setDashboard] = useState<DashboardResponse["dashboard"] | null>(null);
@@ -120,7 +121,7 @@ export function DashboardPage() {
                                               <KpiValueLoader />
                                           ) : (
                                               <p style={{fontSize: "2rem", fontWeight: 600, lineHeight: 1,}}>
-                                                  {dashboard?.[kpi.key]}
+                                                  {dashboard?.[kpi.key as keyof typeof dashboard]}
                                               </p>
                                           )}
                                       </div>
