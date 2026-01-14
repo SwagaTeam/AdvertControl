@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route} from "react-router-dom";
+import {BrowserRouter as Router, Routes, Route, Navigate} from "react-router-dom";
 import { DashboardPage } from "./components/DashboardPage";
 import { ScreensPage } from "./components/ScreensPage/ScreensPage.tsx";
 import { LoginPage } from "./components/loginPage/LoginPage.tsx";
@@ -18,6 +18,7 @@ export default function App() {
             <Routes>
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/" element={<LandingPage />} />
+                <Route path="/screens/create-screen" element={<Navigate to={{pathname: "/crm/screens", search: location.search}} replace/>}/>
                 <Route path="/crm" element={<MainLayout />} >
                     <Route index element={<DashboardPage />} />
                     <Route path="dashboard" element={<DashboardPage />} />

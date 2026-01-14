@@ -2693,3 +2693,13 @@ html {
     display: none !important;
   }
 }
+
+.element-qr {
+  display: inline;
+}
+
+@media (min-width: 640px) {
+  .element-qr {
+    display: none !important;
+  }
+}
