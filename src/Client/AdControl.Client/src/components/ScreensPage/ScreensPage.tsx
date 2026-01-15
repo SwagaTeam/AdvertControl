@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
-import { Plus, Search, Filter } from "lucide-react";
+import {Plus, Search, Filter, QrCode, X} from "lucide-react";
 import { Button } from "../ui/button.tsx";
 import { Input } from "../ui/input.tsx";
 import { Card } from "../ui/card.tsx";
+import { Scanner } from "@yudiel/react-qr-scanner";
 import {
   Table,
   TableBody,
@@ -32,7 +33,10 @@ import {getStatusBadge} from "./StatusBadge.tsx";
 export function ScreensPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [isQrScannerOpen, setIsQrScannerOpen] = useState(false); // ← новый стейт
+  const [qrCodeValue, setQrCodeValue] = useState<string | null>(null);
+  const [initialCodeFromUrl, setInitialCodeFromUrl] = useState<string | undefined>(undefined);
 
   const navigate = useNavigate();
 
@@ -53,7 +57,7 @@ export function ScreensPage() {
 
   useEffect(() => {
     if (createStatus === "succeeded") {
-      setIsDialogOpen(false);
+      setIsCreateDialogOpen(false);
       dispatch(resetCreateStatus());
 
       if (offset !== 0 || items.length === 0) {
@@ -61,6 +65,34 @@ export function ScreensPage() {
       }
     }
   }, [createStatus, dispatch, offset, items.length, limit]);
+
+  useEffect(() => {
+    if (qrCodeValue) {
+      setIsCreateDialogOpen(true);
+      try {
+        const url = new URL(qrCodeValue);
+        const code = url.searchParams.get("code");
+        if (code) {
+          setQrCodeValue(code);
+        }
+      } catch {
+        // если не получилось распарсить — оставляем как есть
+      }
+    }
+  }, [qrCodeValue]);
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const code = params.get('code');
+
+    if (code) {
+      setInitialCodeFromUrl(code);
+      setIsCreateDialogOpen(true);
+
+      const newUrl = `${location.pathname}`;
+      window.history.replaceState({}, '', newUrl);
+    }
+  }, [location.search, location.pathname]);
 
   const handleNextPage = () => {
     if (offset + limit < total) {
@@ -83,8 +115,9 @@ export function ScreensPage() {
   };
 
   const handleDialogOpenChange = (open: boolean) => {
-    setIsDialogOpen(open);
+    setIsCreateDialogOpen(open);
     if (!open) {
+      setQrCodeValue(null);
       dispatch(resetCreateStatus());
     }
   };
@@ -101,6 +134,16 @@ export function ScreensPage() {
     return matchesSearch;
   });
 
+  const handleQrScan = (detectedCodes: any[]) => {
+    if (detectedCodes?.length > 0) {
+      const value = detectedCodes[0].rawValue;
+      if (value) {
+        setQrCodeValue(value);
+        setIsQrScannerOpen(false); // закрываем сканер сразу после успеха
+      }
+    }
+  };
+
   return (
       <div className="space-y-6">
         <div className="flex items-center justify-between">
@@ -109,15 +152,62 @@ export function ScreensPage() {
             <p className="text-gray-600 mt-1">Управляйте своей сетью экранов</p>
           </div>
 
-          <Button
-              style={{ backgroundColor: "#2563EB" }}
-              className="gap-2"
-              onClick={() => setIsDialogOpen(true)}
-          >
-            <Plus className="h-4 w-4" />
-            Добавить экран
-          </Button>
+          <div className="flex gap-3">
+            <Button
+                style={{ backgroundColor: "#2563EB" }}
+                className="gap-2"
+                onClick={() => setIsCreateDialogOpen(true)}
+            >
+              <Plus className="h-4 w-4" />
+              <span className="element-plus">Добавить экран</span>
+            </Button>
+
+            <Button
+                variant="outline"
+                className="gap-2 element-qr"
+                onClick={() => setIsQrScannerOpen(true)}
+            >
+              <QrCode className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
+
+        {isQrScannerOpen && (
+            <div className="fixed inset-0 bg-black/50 flex flex-col items-center z-50 p-4">
+              {/* Контейнер сканера */}
+
+              <div className="max-w-lg w-full overflow-hidden rounded-xl">
+                <div className="bg-white rounded-md p-2" style={{borderBottomLeftRadius: "0px",borderBottomRightRadius: "0px"}}>
+                  <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setIsQrScannerOpen(false)}
+                  >
+                    <X />
+                  </Button >
+                </div>
+                <div className="aspect-video bg-black relative">
+
+                  <Scanner
+                      onScan={handleQrScan}
+                      onError={(err) => console.error("Scanner error:", err)}
+                      components={{
+                        finder: true,
+                      }}
+                      styles={{
+                        container: { height: "100%" },
+                        video: { objectFit: "cover" },
+                      }}
+                      constraints={{ facingMode: "environment" }}
+                  />
+                </div>
+
+                <div className="bg-white p-4 text-center text-sm text-gray-500">
+                  Наведите камеру на QR-код с регистрацией экрана
+                </div>
+              </div>
+            </div>
+        )}
 
         {/* Таблица экранов */}
         <Card className="shadow-sm">
@@ -196,11 +286,12 @@ export function ScreensPage() {
         </Card>
 
         <CreateScreenForm
-            isOpen={isDialogOpen}
+            isOpen={isCreateDialogOpen}
             onOpenChange={handleDialogOpenChange}
             onSubmit={handleCreateScreen}
             isSubmitting={createStatus === "loading"}
             error={createError}
+            initialCode={initialCodeFromUrl ?? qrCodeValue ?? undefined}
         />
       </div>
   );

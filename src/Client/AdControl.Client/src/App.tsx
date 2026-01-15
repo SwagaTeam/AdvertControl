@@ -1,7 +1,6 @@
-import { BrowserRouter as Router, Routes, Route} from "react-router-dom";
+import {BrowserRouter as Router, Routes, Route, Navigate} from "react-router-dom";
 import { DashboardPage } from "./components/DashboardPage";
 import { ScreensPage } from "./components/ScreensPage/ScreensPage.tsx";
-import { TemplatesPage } from "./components/TemplatesPage";
 import { LoginPage } from "./components/loginPage/LoginPage.tsx";
 import { MainLayout } from "./components/layouts/MainLayout";
 import {ProfileScreen} from "./components/ProfileScreen/ProfileScreen.tsx";
@@ -19,13 +18,14 @@ export default function App() {
             <Routes>
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/" element={<LandingPage />} />
+                <Route path="/screens/create-screen" element={<Navigate to={{pathname: "/crm/screens", search: location.search}} replace/>}/>
                 <Route path="/crm" element={<MainLayout />} >
                     <Route index element={<DashboardPage />} />
                     <Route path="dashboard" element={<DashboardPage />} />
                     <Route path="screens" element={<ScreensPage />} />
-                    <Route path="templates" element={<TemplatesPage />} />
                     <Route path="profile" element={<ProfileScreen />} />
                     <Route path="users" element={<UsersPage />} />
+                    <Route path="user/:id" element={<ProfileScreen />} />
                     <Route path="settings" element={<SettingsPage />} />
                     <Route path="screen/:id" element={<ScreenDetail />} />
                     <Route path="screen/:id/config" element={<SignageCreatorPage />} />

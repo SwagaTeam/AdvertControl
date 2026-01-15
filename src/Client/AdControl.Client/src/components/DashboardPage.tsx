@@ -5,6 +5,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from ".
 import {apiClient} from "../api/apiClient.ts";
 import ContentLoader from "react-content-loader";
 import {getStatusBadge} from "./ScreensPage/StatusBadge.tsx";
+import {useNavigate} from "react-router-dom";
 
 type DashboardResponse = {
   success: boolean;
@@ -16,6 +17,7 @@ type DashboardResponse = {
     waitingScreens: number;
     actions: {
       screen: string;
+      screenId: string;
       action_: string;
       lastUpdate: string;
       status: boolean;
@@ -27,9 +29,11 @@ type DashboardResponse = {
   };
 };
 
+
 export function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [dashboard, setDashboard] = useState<DashboardResponse["dashboard"] | null>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const loadDashboard = async () => {
@@ -83,6 +87,7 @@ export function DashboardPage() {
       dashboard?.actions.map((item, index) => ({
         id: index,
         screen: item.screen,
+        screenId: item.screenId,
         action: item.action_,
         time: item.lastUpdate,
         status: item.status ? "SUCCESS" : "ERROR",
@@ -120,7 +125,7 @@ export function DashboardPage() {
                                               <KpiValueLoader />
                                           ) : (
                                               <p style={{fontSize: "2rem", fontWeight: 600, lineHeight: 1,}}>
-                                                  {dashboard?.[kpi.key]}
+                                                  {dashboard?.[kpi.key as keyof typeof dashboard]}
                                               </p>
                                           )}
                                       </div>
@@ -171,7 +176,7 @@ export function DashboardPage() {
                                 </TableRow>
                             ))
                             : activityLog.map((log) => (
-                                <TableRow key={log.id}>
+                                <TableRow key={log.id} onClick={() => navigate(`/crm/screen/${log.screenId}`)}>
                                     <TableCell>{log.screen}</TableCell>
                                     <TableCell className="text-gray-600">{log.action}</TableCell>
                                     <TableCell className="text-gray-500">{log.time}</TableCell>

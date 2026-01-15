@@ -2628,7 +2628,7 @@ html {
   right: 0;
   background-color: white;
   border-top: 1px solid #e5e7eb;
-  padding: 0.5rem 0; /* py-2 = 0.5rem сверху и снизу */
+  padding: 0.5rem 0 1.5rem 0;
   z-index: 50;
 
   /* Скрыта на 1024px+ */
@@ -2676,10 +2676,68 @@ html {
 }
 
 .landing-btn {
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   padding: 1rem 0.85rem;
 }
 
 @media (min-width: 768px) {
   .landing-btn { font-size: 1.25rem; }
+}
+
+.element-plus {
+  display: inline;
+}
+
+@media (max-width: 640px) {
+  .element-plus {
+    display: none !important;
+  }
+}
+
+.element-qr {
+  display: inline;
+}
+
+@media (min-width: 640px) {
+  .element-qr {
+    display: none !important;
+  }
+}
+
+.image-generated {
+  max-height: 300px;
+}
+
+@media (min-width: 641px) and (max-width: 1023px) {
+  .image-generated {
+    max-height: 52vh;
+  }
+}
+
+@media (min-width: 1024px) {
+  .image-generated {
+    max-height: 60vh;
+  }
+}
+
+.responsive-grid {
+  display: grid;
+  gap: 0.25rem;
+  padding: 0.5rem;
+  width: 100%;
+  grid-template-columns: repeat(2, 1fr);
+}
+
+@media (min-width: 640px) {
+  .responsive-grid {
+    padding: 1rem;
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (min-width: 1200px) {
+  .responsive-grid {
+    padding: 1rem;
+    grid-template-columns: repeat(6, 1fr);
+  }
 }
