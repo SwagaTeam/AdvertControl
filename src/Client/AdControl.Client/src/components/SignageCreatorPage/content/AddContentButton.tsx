@@ -8,7 +8,7 @@ import {
 } from "../../ui/dropdown-menu";
 import { Plus, FileText, Image as ImageIcon, Video } from "lucide-react";
 import type { ContentItem, ContentType } from "../types";
-import { toast } from "../../ui/sonner";
+import { toast } from "../../ui/toast";
 import {apiClient} from "../../../api/apiClient.ts";
 
 

@@ -1,11 +1,12 @@
 import { Monitor, MapPin, Activity } from "lucide-react";
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
+import type { CSSProperties } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {useNavigate} from "react-router-dom";
 import type { AppDispatch, RootState } from "../../store/store.ts";
 import { fetchScreen } from "../../store/screenSlice.ts";
-import { toast } from "../ui/sonner.tsx";
+import { toast } from "../ui/toast.ts";
 import { ConfigPreview } from "./ConfigPreview.tsx";
 import {ScreenDetailModal} from "./ScreenDetailModal.tsx";
 import { Button } from "../ui/button.tsx";
@@ -128,7 +129,7 @@ export function ScreenDetail() {
                                     </div>
                                     <Button onClick={() => navigate(`/crm/screen/${id}/config/edit`, {
                                         state: {
-                                            configId: screenData.config.id,
+                                            configId: screenData.config?.id,
                                         },
                                     })}>Перейти</Button>
                                 </div>
@@ -137,7 +138,7 @@ export function ScreenDetail() {
                                 <ScreenDetailModal
                                     dialogOpen={dialogOpen}
                                     setDialogOpen={setDialogOpen}
-                                    screenId={screenData.id}/>
+                                    screenId={screenData.id || ""}/>
                             )}
                         </div>
                     </div>
@@ -163,7 +164,7 @@ export function ScreenDetail() {
     );
 }
 
-const styles = {
+const styles: Record<string, CSSProperties> = {
     container: {
         backgroundColor: "#f9fafb",
     },
@@ -187,7 +188,7 @@ const styles = {
         display: "flex",
         gap: "24px",
         flexWrap: "wrap",
-    },
+    } as CSSProperties,
     infoBlock: {
         backgroundColor: "#ffffff",
         borderRadius: "8px",
@@ -198,7 +199,7 @@ const styles = {
         flex: "1 1 320px",
         display: "flex",
         flexDirection: "column",
-    },
+    } as CSSProperties,
     previewBlock: {
         backgroundColor: "#ffffff",
         borderRadius: "8px",
@@ -233,7 +234,7 @@ const styles = {
         display: "flex",
         flexDirection: "column",
         gap: "16px",
-    },
+    } as CSSProperties,
     infoItem: {
         display: "flex",
         gap: "12px",

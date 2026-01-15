@@ -21,7 +21,7 @@ import {
 
 import { Button } from "../ui/button.tsx";
 import { apiClient } from "../../api/apiClient.ts";
-import { toast } from "../ui/sonner";
+import { toast } from "../ui/toast";
 import type {SignageConfig} from "../SignageCreatorPage/types.ts";
 
 interface ScreenDetailModalProps {

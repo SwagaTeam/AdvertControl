@@ -4,7 +4,7 @@ import { Sparkles } from "lucide-react";
 import { Card } from "./ui/card";
 import { Button } from "./ui/button";
 import { Textarea } from "./ui/textarea";
-import { toast } from "./ui/sonner.tsx";
+import { toast } from "./ui/toast.ts";
 import { apiClient, MINIO_PUBLIC_URL } from "../api/apiClient.ts";
 
 export function ImageGenerationPage() {

@@ -1,7 +1,7 @@
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "../../ui/collapsible.tsx";
 import {ChevronUp, ChevronDown, FileText} from "lucide-react";
 import { useState } from "react";
-import { toast } from "../../ui/sonner.tsx";
+import { toast } from "../../ui/toast.ts";
 import { AddContentButton } from "../content/AddContentButton.tsx";
 import { ContentItemCard } from "../content/ContentItemCard.tsx";
 import type { ContentItem, ContentType, SignageConfig } from "../types.ts";

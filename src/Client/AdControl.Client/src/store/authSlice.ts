@@ -22,7 +22,8 @@ export const loginUser = createAsyncThunk(
 export const logoutUser = createAsyncThunk("auth/logoutUser", async (_, { dispatch }) => {
     try {
         await apiClient.post("/auth/logout", {});
-    } catch (e) {
+    } catch {
+        // Игнорируем ошибку при logout
     }
     localStorage.removeItem("token");
 

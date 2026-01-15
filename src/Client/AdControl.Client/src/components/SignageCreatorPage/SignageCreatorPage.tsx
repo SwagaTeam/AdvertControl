@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import { toast } from "../ui/sonner";
+import { toast } from "../ui/toast";
 
 import { LeftSidebar } from "./layout/LeftSidebar";
 import { MainContent } from "./layout/MainContent";
@@ -57,16 +57,6 @@ export function SignageCreatorPage() {
         fetchConfig();
     }, [configId]);
 
-    const handleSave = () => toast.success("Saved as draft");
-
-    const handlePublish = () => {
-        if (config.items.length === 0) {
-            toast.error("Add at least one item");
-            return;
-        }
-        toast.success("Published!");
-    };
-
     const updateItem = (url: string, updates: Partial<ContentItem>) => {
         setConfig(prev => ({
             ...prev,
@@ -91,8 +81,6 @@ export function SignageCreatorPage() {
                 setConfig={setConfig}
                 selectedItem={selectedItemUrl}
                 setSelectedItem={setSelectedItemUrl}
-                onSave={handleSave}
-                onPublish={handlePublish}
                 screenId={screenId}
                 isEdit={isEdit}
             />

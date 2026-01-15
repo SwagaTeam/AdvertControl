@@ -4,7 +4,7 @@ import { ContentList } from "../config/ContentList";
 import { ActionButtons } from "../config/ActionButtons";
 import type { SignageConfig } from "../types";
 import { apiClient } from "../../../api/apiClient";
-import { toast } from "../../ui/sonner";
+import { toast } from "../../ui/toast";
 import { useNavigate } from "react-router-dom";
 
 interface Props {

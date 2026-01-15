@@ -1,6 +1,5 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import { Label } from "./ui/label";
-import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { Switch } from "./ui/switch";
 import { Separator } from "./ui/separator";

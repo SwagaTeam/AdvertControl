@@ -35,25 +35,23 @@ export function DashboardPage() {
   const [dashboard, setDashboard] = useState<DashboardResponse["dashboard"] | null>(null);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const loadDashboard = async () => {
-      try {
-        const { data } = await apiClient.get<DashboardResponse>(
-            `/screen/dashboard`
-        );
-        if (data.success) {
-          setDashboard(data.dashboard);
-          console.log(data.dashboard);
-        }
-      } catch (e) {
-        console.error("Ошибка загрузки dashboard", e);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadDashboard();
-  }, []);
+    useEffect(() => {
+        (async () => {
+            try {
+                const { data } = await apiClient.get<DashboardResponse>(
+                    `/screen/dashboard`
+                );
+                if (data.success) {
+                    setDashboard(data.dashboard);
+                    console.log(data.dashboard);
+                }
+            } catch (e) {
+                console.error("Ошибка загрузки dashboard", e);
+            } finally {
+                setLoading(false);
+            }
+        })();
+    }, []);
 
     const kpiData = [
         {
@@ -125,7 +123,7 @@ export function DashboardPage() {
                                               <KpiValueLoader />
                                           ) : (
                                               <p style={{fontSize: "2rem", fontWeight: 600, lineHeight: 1,}}>
-                                                  {dashboard?.[kpi.key as keyof typeof dashboard]}
+                                                  {(dashboard?.[kpi.key as keyof typeof dashboard] as number) || 0}
                                               </p>
                                           )}
                                       </div>

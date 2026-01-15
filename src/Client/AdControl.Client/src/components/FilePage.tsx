@@ -15,7 +15,7 @@ export const FilePage = () => {
                 const response = await apiClient.get("files/get-current-user-files-name");
                 console.log(response);
                 setFiles(response.data.filesName);
-            } catch (e: any) {
+            } catch {
                 setError("Не удалось загрузить файлы");
                 setFiles([]);
             } finally {

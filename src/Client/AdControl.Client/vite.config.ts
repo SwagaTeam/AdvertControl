@@ -1,11 +1,9 @@
 /// <reference types="node" />
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { defineConfig, loadEnv } from 'vite';
+import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
-import { env } from 'process';
 import { VitePWA } from 'vite-plugin-pwa'
 
-export default defineConfig(({ mode }) => {
+export default defineConfig(() => {
 //import.meta.env.VITE_GEMINI_API_KEY
 
   const API = process.env.SERVER_API_URL ?
