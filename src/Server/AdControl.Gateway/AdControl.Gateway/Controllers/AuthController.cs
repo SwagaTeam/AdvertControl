@@ -177,14 +177,11 @@ public class AuthController : ControllerBase
     public async Task<IActionResult> GetUserInfo(string id)
     {
         var token = GetBearerToken();
+
         if (IsTokenExpired(token))
             return Unauthorized();
 
         var requestUserId = new UserIdRequest { Token = token };
-        var currentUserId = await _authServiceClient.GetCurrentUserIdAsync(requestUserId);
-
-        if (id != currentUserId.Id)
-            return Unauthorized();
 
         var request = new UserInfoRequest { Id = id };
         var resp = await _authServiceClient.GetUserInfoAsync(request, BuildAuthMetadata(HttpContext));
