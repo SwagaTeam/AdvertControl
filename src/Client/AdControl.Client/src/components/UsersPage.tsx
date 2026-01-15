@@ -35,6 +35,7 @@ import {
 
 import { apiClient } from "../api/apiClient";
 import { generateRandomPassword } from "../utils";
+import {useNavigate} from "react-router-dom";
 
 /* ===================== TYPES ===================== */
 
@@ -99,6 +100,8 @@ export function UsersPage() {
     const [showPassword, setShowPassword] = useState(false);
 
     const [form, setForm] = useState<FormState>(initialFormState);
+
+    const navigate = useNavigate();
 
     /* ===================== EFFECTS ===================== */
 
@@ -403,7 +406,7 @@ export function UsersPage() {
                                     u.username.slice(0, 2).toUpperCase();
 
                                 return (
-                                    <TableRow key={u.userId}>
+                                    <TableRow key={u.userId} onClick={() => navigate(`/crm/user/${u.userId}`)}>
                                         <TableCell>
                                             <div className="flex items-center gap-3">
                                                 <Avatar className="h-8 w-8">

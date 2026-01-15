@@ -1,6 +1,6 @@
 import { Card, CardHeader, CardTitle, CardContent } from "../../ui/card";
 import type { ContentItem } from "../types";
-import {removeId, truncateString} from "../../../utils.ts";
+import {removeId} from "../../../utils.ts";
 
 interface TimelineProps {
     items: ContentItem[];

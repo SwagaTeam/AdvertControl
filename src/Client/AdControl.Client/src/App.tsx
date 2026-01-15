@@ -25,6 +25,7 @@ export default function App() {
                     <Route path="screens" element={<ScreensPage />} />
                     <Route path="profile" element={<ProfileScreen />} />
                     <Route path="users" element={<UsersPage />} />
+                    <Route path="user/:id" element={<ProfileScreen />} />
                     <Route path="settings" element={<SettingsPage />} />
                     <Route path="screen/:id" element={<ScreenDetail />} />
                     <Route path="screen/:id/config" element={<SignageCreatorPage />} />

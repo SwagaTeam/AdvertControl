@@ -103,7 +103,7 @@ export const FilePage = () => {
                                 />
                             </div>
                         )}
-                        <p className="text-sm" style={{color:"white", justifySelf: "center", marginTop: "2px"}}>{selectedFile}</p>
+                        <p className="text-sm" style={{color:"white", justifySelf: "center", marginTop: "2px", overflowWrap: "break-word",  maxWidth: "80vw", wordBreak: "break-all"}}>{selectedFile}</p>
                     </div>
                 </div>
             )}
@@ -121,11 +121,7 @@ export const FilePage = () => {
 
                 <div className="flex justify-center">
                     <div
-                        className="grid gap-3 p-2 sm:p-4"
-                        style={{
-                            gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))",
-                            width: "100%",
-                        }}
+                        className="grid gap-1 p-2 sm:p-4 responsive-grid"
                     >
                         {/* LOADING */}
                         {loading &&
@@ -133,7 +129,7 @@ export const FilePage = () => {
                                 <div
                                     key={i}
                                     className="flex flex-col rounded-lg border p-1"
-                                    style={{ maxWidth: "300px" }}
+                                    style={{ maxWidth: "500px" }}
                                 >
                                     <FileSkeleton />
                                 </div>
@@ -156,7 +152,7 @@ export const FilePage = () => {
                                         key={file}
                                         className="flex flex-col rounded-lg border hover:shadow-md cursor-pointer transition-shadow duration-200 bg-white"
                                         style={{
-                                            maxWidth: "280px",
+                                            maxWidth: "400px",
                                             minWidth: "100px",
                                             padding: "5px",
                                         }}
