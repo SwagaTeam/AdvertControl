@@ -177,6 +177,7 @@ public class AuthController : ControllerBase
     public async Task<IActionResult> GetUserInfo(string id)
     {
         var token = GetBearerToken();
+
         if (IsTokenExpired(token))
             return Unauthorized();
 

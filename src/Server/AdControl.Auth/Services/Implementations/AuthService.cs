@@ -155,13 +155,17 @@ public class AuthService : Protos.AuthService.AuthServiceBase
             phone = phoneProp.EnumerateArray().First().GetString() ?? string.Empty;
         }
 
-        // role — первая непустая строка из roles[]
         var role = string.Empty;
-        if (root.TryGetProperty("roles", out var rolesProp) && rolesProp.ValueKind == JsonValueKind.Array)
+
+        if (root.TryGetProperty("realm_access", out var realmAccess) &&
+            realmAccess.TryGetProperty("roles", out var roles))
         {
-            role = rolesProp.EnumerateArray()
-                .Select(r => r.ValueKind == JsonValueKind.String ? r.GetString() : null)
-                .FirstOrDefault(s => !string.IsNullOrEmpty(s)) ?? string.Empty;
+            role = roles
+                .EnumerateArray()
+                .Select(r => r.GetString())
+                .Where(r => r != null)
+                .FirstOrDefault(r => r!.ToLowerInvariant() == "admin" || r == "user")
+                ?? string.Empty;
         }
 
         return new UserInfoResponse
