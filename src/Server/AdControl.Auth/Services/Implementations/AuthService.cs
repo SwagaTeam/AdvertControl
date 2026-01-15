@@ -164,7 +164,7 @@ public class AuthService : Protos.AuthService.AuthServiceBase
                 .EnumerateArray()
                 .Select(r => r.GetString())
                 .Where(r => r != null)
-                .FirstOrDefault(r => r!.ToLowerInvariant() == "admin" || r == "user")
+                .FirstOrDefault(r => r!.ToLowerInvariant() == "admin" || r!.ToLowerInvariant() == "user")
                 ?? string.Empty;
         }
 

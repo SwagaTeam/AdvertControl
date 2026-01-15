@@ -182,11 +182,6 @@ public class AuthController : ControllerBase
             return Unauthorized();
 
         var requestUserId = new UserIdRequest { Token = token };
-        var currentUserId = await _authServiceClient.GetCurrentUserIdAsync(requestUserId);
-        var userRole = (await _authServiceClient.GetUserInfoAsync(new UserInfoRequest() { Id = currentUserId.Id })).Role;
-
-        if (id != currentUserId.Id && userRole != "Admin")
-            return Unauthorized();
 
         var request = new UserInfoRequest { Id = id };
         var resp = await _authServiceClient.GetUserInfoAsync(request, BuildAuthMetadata(HttpContext));
