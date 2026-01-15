@@ -13,20 +13,23 @@ import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchProfile } from "../../store/profileSlice.ts";
 import { logoutUser } from "../../store/authSlice.ts";
+import type { AppDispatch, RootState } from '../../store/store';
 import { useNavigate } from "react-router-dom";
 import ContentLoader from "react-content-loader";
 
 export function Header({ isMinimal = false }: { isMinimal?: boolean }) {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
 
   const { data, loading, error } = useSelector((state: any) => state.profile);
-  const { token } = useSelector((state: any) => state.auth);
+  const { token } = useSelector((state: RootState) => state.auth);
 
   useEffect(() => {
     if (token) {
-      // @ts-expect-error фикс линтера
       dispatch(fetchProfile());
+    }
+    if (data?.username === "") {
+      dispatch(logoutUser());
     }
   }, [dispatch, token]);
 
@@ -42,7 +45,6 @@ export function Header({ isMinimal = false }: { isMinimal?: boolean }) {
   };
 
   const handleLogout = () => {
-    // @ts-expect-error фикс линтера
     dispatch(logoutUser());
     setTimeout(() => navigate("/"), 50);
   };
