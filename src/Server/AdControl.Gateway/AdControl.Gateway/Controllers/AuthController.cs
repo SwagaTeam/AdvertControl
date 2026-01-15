@@ -182,8 +182,9 @@ public class AuthController : ControllerBase
 
         var requestUserId = new UserIdRequest { Token = token };
         var currentUserId = await _authServiceClient.GetCurrentUserIdAsync(requestUserId);
+        var userRole = (await _authServiceClient.GetUserInfoAsync(new UserInfoRequest() { Id = currentUserId.Id })).Role;
 
-        if (id != currentUserId.Id)
+        if (id != currentUserId.Id && userRole != "Admin")
             return Unauthorized();
 
         var request = new UserInfoRequest { Id = id };
