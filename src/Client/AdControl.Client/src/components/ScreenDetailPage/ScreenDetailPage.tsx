@@ -50,7 +50,7 @@ export function ScreenDetail() {
 
     return (
         <div style={styles.container}>
-            <style jsx>{`
+            <style>{`
       @media (max-width: 1024px) {
         .layout-grid {
           flex-direction: column;
@@ -203,10 +203,10 @@ const styles = {
         backgroundColor: "#ffffff",
         borderRadius: "8px",
         border: "1px solid #e5e7eb",
-        padding: "24px",
+        padding: 24,
         width: "66.666%",
-        minWidth: "400px",
-        flex: "2 1 400px",
+        minWidth: "300px",
+        maxWidth: "90vw",
     },
     blockTitle: {
         fontSize: "18px",

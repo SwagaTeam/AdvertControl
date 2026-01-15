@@ -51,16 +51,22 @@ type ApiUser = {
 };
 
 type FormState = {
+    phone: string;
     username: string;
+    name: string;
+    secondName: string;
+    email: string;
     password: string;
-    repeatPassword: string;
     role: "admin" | "user" | "";
 };
 
 const initialFormState: FormState = {
+    phone: "",
     username: "",
+    name: '',
+    secondName: "",
+    email: '',
     password: "",
-    repeatPassword: "",
     role: "",
 };
 
@@ -124,11 +130,15 @@ export function UsersPage() {
         try {
             setIsSubmitting(true);
 
-            await apiClient.post("/auth/users", {
+            await apiClient.post("/auth/register", {
                 username: form.username,
+                name: form.name,
+                secondName: form.secondName,
+                email: form.email,
+                phone: form.phone,
                 password: form.password,
-                repeatPassword: form.repeatPassword,
-                roles: [form.role],
+                repeatPassword: form.password,
+                roles: form.role,
             });
 
             await fetchUsers();
@@ -201,7 +211,7 @@ export function UsersPage() {
                     </p>
                 </div>
 
-                <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen} >
                     <DialogTrigger asChild>
                         <Button style={{ backgroundColor: "#2563EB" }} className="gap-2">
                         <Plus className="h-4 w-4" />
@@ -209,7 +219,7 @@ export function UsersPage() {
                     </Button>
                     </DialogTrigger>
 
-                    <DialogContent>
+                    <DialogContent style={{ overflowY: "auto" }}>
                         <DialogHeader>
                             <DialogTitle>Новый пользователь</DialogTitle>
                             <DialogDescription>
@@ -218,6 +228,52 @@ export function UsersPage() {
                         </DialogHeader>
 
                         <div className="space-y-4 py-4">
+                            <div className="space-y-2">
+                                <Label>Номер телефона</Label>
+                                <Input
+                                    type="phone"
+                                    value={form.phone}
+                                    onChange={(e) =>
+                                        updateForm("phone", e.target.value)
+                                    }
+                                />
+                            </div>
+
+                            <div className="space-y-2">
+                                <Label>Email</Label>
+                                <Input
+                                    type="email"
+                                    value={form.email}
+                                    onChange={(e) =>
+                                        updateForm("email", e.target.value)
+                                    }
+                                />
+                            </div>
+
+                            <div className=" flex items-center gap-2">
+                                <div className="space-y-2">
+                                    <Label>Имя</Label>
+                                    <Input
+                                        value={form.name}
+                                        onChange={(e) =>
+                                            updateForm("name", e.target.value)
+                                        }
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label>Фамилия</Label>
+                                    <Input
+                                        value={form.secondName}
+                                        onChange={(e) =>
+                                            updateForm("secondName", e.target.value)
+                                        }
+                                    />
+                                </div>
+                            </div>
+                            <div className="space-y-2">
+
+                            </div>
+
                             <div className="space-y-2">
                                 <Label>Логин</Label>
                                 <Input
@@ -246,19 +302,6 @@ export function UsersPage() {
                                     >
                                         <RefreshCw className="h-3 w-3" />
                                     </Button>
-                                </div>
-                            </div>
-
-                            <div className="space-y-2">
-                                <Label>Повторите пароль</Label>
-                                <div className="flex gap-2">
-                                    <Input
-                                        type={showPassword ? "text" : "password"}
-                                        value={form.repeatPassword}
-                                        onChange={(e) =>
-                                            updateForm("repeatPassword", e.target.value)
-                                        }
-                                    />
                                     <Button
                                         type="button"
                                         variant="outline"
@@ -347,7 +390,6 @@ export function UsersPage() {
                                 <TableHead>Пользователь</TableHead>
                                 <TableHead>Имя</TableHead>
                                 <TableHead>Фамилия</TableHead>
-                                <TableHead>Email</TableHead>
                                 <TableHead>Роль</TableHead>
                                 <TableHead>Статус</TableHead>
                                 <TableHead className="text-right">Действия</TableHead>
@@ -374,7 +416,6 @@ export function UsersPage() {
                                         </TableCell>
                                         <TableCell>{u.firstName || "—"}</TableCell>
                                         <TableCell>{u.lastName || "—"}</TableCell>
-                                        <TableCell>{u.email || "—"}</TableCell>
                                         <TableCell>{getRoleBadge(u.role)}</TableCell>
                                         <TableCell>
                                             {getStatusBadge(u.enabled)}
