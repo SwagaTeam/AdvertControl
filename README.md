@@ -48,6 +48,8 @@
 
 ## Технологии
 
+Бэкэнд:
+
 * Язык: C#
 * Платформа: .NET (API, сервисы)
 * Клиент: Avalonia (кроссплатформенно), Android (native часть)
@@ -59,6 +61,17 @@
 * Контейнеризация: Docker, docker-compose
 * QR-генерация: ZXing / SkiaSharp (на клиенте)
 
+Фронтэнд: 
+
+* Язык: TypeScript
+* Фреймворки: React, Tailwind CSS
+* Сборщик: Vite
+* Менеджер состояний: Redux
+* Rest-запросы: axios
+* Библиотека компонентов: Radix UI
+* Drag & Drop: dnd-kit
+* Анимации фона: Web-GL
+* PWA: vite-plugin-pwa
 ---
 
 ## Учебный контекст
@@ -74,6 +87,7 @@
 Проект распространяется под лицензией **Apache License 2.0**.
 Полный текст лицензии доступен по ссылке:
 > [Apache License 2.0](https://github.com/holo2k/AdvertControl/blob/main/LICENSE)
+
 
 
 
