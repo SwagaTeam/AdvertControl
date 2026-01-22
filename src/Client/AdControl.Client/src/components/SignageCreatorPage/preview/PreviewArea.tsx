@@ -44,7 +44,7 @@ export function PreviewArea({
 
     return (
         <Card className="flex-1 flex flex-col overflow-hidden">
-            <CardHeader className="bg-gray-50" style={{ padding: "8px", paddingBottom: "0px" }} >
+            <CardHeader className="bg-gray-50" style={{ padding: "8px", paddingBottom: "0px", marginBottom: "-25px"  }} >
                 <div className="flex items-center justify-between">
                     <div className="flex items-center justify-between">
                         <Button variant="outline" onClick={() => onFullScreen(true)} disabled={config.items.length === 0} className="gap-2">

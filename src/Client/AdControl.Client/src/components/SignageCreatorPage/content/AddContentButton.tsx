@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import {useRef, useState} from "react";
 import { Button } from "../../ui/button";
 import {
     DropdownMenu,
@@ -6,23 +6,21 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "../../ui/dropdown-menu";
-import { Plus, FileText, Image as ImageIcon, Video } from "lucide-react";
+import { Plus, FileText, Image as ImageIcon, Video, File } from "lucide-react";
 import type { ContentItem, ContentType } from "../types";
 import { toast } from "../../ui/toast";
-import {apiClient} from "../../../api/apiClient.ts";
-
+import {apiClient, MINIO_PUBLIC_URL} from "../../../api/apiClient.ts";
+import {AddObjectModal} from "./AddObjectModal.tsx";
+import { isImage } from "../../../utils.ts";
 
 interface Props {
     onAdd: (type: ContentType, item: ContentItem) => void;
 }
 
-/* ================= COMPONENT ================= */
-
 export function AddContentButton({ onAdd }: Props) {
     const imageInputRef = useRef<HTMLInputElement>(null);
     const videoInputRef = useRef<HTMLInputElement>(null);
-
-    /* ================= UPLOAD ================= */
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     const uploadFile = async (file: File): Promise<string> => {
         const formData = new FormData();
@@ -36,8 +34,6 @@ export function AddContentButton({ onAdd }: Props) {
 
         return response.data.fileUrl;
     };
-
-    /* ================= IMAGE ================= */
 
     const openImagePicker = () => imageInputRef.current?.click();
 
@@ -74,8 +70,6 @@ export function AddContentButton({ onAdd }: Props) {
             e.target.value = "";
         }
     };
-
-    /* ================= VIDEO ================= */
 
     const openVideoPicker = () => videoInputRef.current?.click();
 
@@ -114,10 +108,42 @@ export function AddContentButton({ onAdd }: Props) {
         }
     };
 
-    /* ================= RENDER ================= */
+    const handleSelectExistingFile = async (fileName: string) => {
+        const isImageFile = isImage(fileName);
+
+        if (isImageFile) {
+            const newItem: ContentItem = {
+                type: "IMAGE",
+                durationSeconds: 5,
+                size: 0,
+                url: fileName,
+                order: 1
+            };
+            onAdd("IMAGE", newItem);
+            toast.success("Изображение добавлено из ранее загруженных");
+        } else {
+            const newItem: ContentItem = {
+                type: "VIDEO",
+                durationSeconds: await getVideoDurationFromUrl(`${MINIO_PUBLIC_URL}/ ${fileName}`),
+                size: 0,
+                order: 0,
+                url: fileName,
+            };
+            onAdd("VIDEO", newItem);
+            toast.success("Видео добавлено из ранее загруженных");
+        }
+
+        setIsModalOpen(false);
+    };
 
     return (
         <>
+            <AddObjectModal
+                dialogOpen={isModalOpen}
+                setDialogOpen={setIsModalOpen}
+                onFileSelect={handleSelectExistingFile}
+            />
+
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                     <Button className="w-full gap-2" style={{ backgroundColor: "#f1f1f3", color: "#000", border: "1px solid #cdcbcb" }}>
@@ -126,6 +152,10 @@ export function AddContentButton({ onAdd }: Props) {
                 </DropdownMenuTrigger>
 
                 <DropdownMenuContent className="w-56">
+                    <DropdownMenuItem onSelect={() => setIsModalOpen(true)}>
+                        <File className="w-4 h-4 mr-2" />
+                        Загруженное ранее
+                    </DropdownMenuItem>
                     <DropdownMenuItem onSelect={openImagePicker}>
                         <ImageIcon className="w-4 h-4 mr-2" />
                         Загрузить изображение
@@ -139,11 +169,6 @@ export function AddContentButton({ onAdd }: Props) {
                     <DropdownMenuItem disabled>
                         <FileText className="w-4 h-4 mr-2" />
                         Загрузить таблицу
-                    </DropdownMenuItem>
-
-                    <DropdownMenuItem disabled>
-                        <FileText className="w-4 h-4 mr-2" />
-                        Добавить текст
                     </DropdownMenuItem>
                 </DropdownMenuContent>
             </DropdownMenu>
@@ -183,5 +208,27 @@ const getVideoDuration = (file: File): Promise<number> => {
         };
 
         video.src = URL.createObjectURL(file);
+    });
+};
+
+const getVideoDurationFromUrl = (url: string): Promise<number> => {
+    return new Promise((resolve, reject) => {
+        const video = document.createElement('video');
+
+        video.preload = 'metadata';
+        video.onloadedmetadata = () => {
+            window.URL.revokeObjectURL(video.src);
+            resolve(video.duration);
+        };
+
+        video.onerror = () => {
+            window.URL.revokeObjectURL(video.src);
+            reject(new Error('Не удалось получить метаданные видео'));
+        };
+
+        video.src = url;
+
+        // Для CORS видео
+        video.crossOrigin = 'anonymous';
     });
 };

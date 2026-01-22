@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { apiClient, MINIO_PUBLIC_URL } from "../api/apiClient";
 import ContentLoader from "react-content-loader";
 import {File, X } from "lucide-react";
+import {isVideo, isImage} from "../utils.ts"
 
 export const FilePage = () => {
     const [files, setFiles] = useState<string[]>([]);
@@ -26,13 +27,6 @@ export const FilePage = () => {
         fetchFiles();
     }, []);
 
-    const isVideo = (name: string) =>
-        ["mp4", "webm", "ogg"].some(ext => name.toLowerCase().endsWith(ext));
-
-    const isImage = (name: string) =>
-        ["jpg", "jpeg", "png", "gif", "webp"].some(ext =>
-            name.toLowerCase().endsWith(ext)
-        );
 
     const handleFileClick = (fileName: string) => {
         if (isImage(fileName) || isVideo(fileName)) {
@@ -44,7 +38,6 @@ export const FilePage = () => {
         setSelectedFile(null);
     };
 
-    // Закрытие по ESC
     useEffect(() => {
         const handleEsc = (e: KeyboardEvent) => {
             if (e.key === 'Escape') handleCloseModal();
@@ -57,7 +50,6 @@ export const FilePage = () => {
 
     return (
         <>
-            {/* Модальное окно для предпросмотра */}
             {selectedFile && (
                 <div
                     className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"

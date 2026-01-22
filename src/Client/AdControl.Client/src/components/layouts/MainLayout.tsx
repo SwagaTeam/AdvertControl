@@ -4,7 +4,7 @@ import { Sidebar } from "./Sidebar.tsx";
 import {Outlet} from "react-router-dom";
 
 
-export const MainLayout = () => {
+export default function MainLayout() {
     const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
 
     return (

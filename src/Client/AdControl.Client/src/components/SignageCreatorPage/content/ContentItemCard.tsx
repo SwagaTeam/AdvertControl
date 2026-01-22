@@ -64,7 +64,7 @@ export function ContentItemCard({
                     <div className="flex items-center justify-between mb-1">
                         <div className="flex items-center gap-2">
                             {typeIcons[item.type]}
-                            <span className="text-sm font-medium truncate break-all" style={{maxWidth: "200px",}}>
+                            <span className="text-sm font-medium truncate break-all" style={{maxWidth: "180px",}}>
                                 {removeId(item?.url || "")  }
                             </span>
                         </div>

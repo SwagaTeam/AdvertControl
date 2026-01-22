@@ -37,8 +37,6 @@ import { apiClient } from "../api/apiClient";
 import { generateRandomPassword } from "../utils";
 import {useNavigate} from "react-router-dom";
 
-/* ===================== TYPES ===================== */
-
 type ApiUser = {
     userId: string;
     username: string;
@@ -71,8 +69,6 @@ const initialFormState: FormState = {
     role: "",
 };
 
-/* ===================== LOADER ===================== */
-
 const UsersTableLoader = () => (
     <ContentLoader
         speed={2}
@@ -88,8 +84,6 @@ const UsersTableLoader = () => (
     </ContentLoader>
 );
 
-/* ===================== COMPONENT ===================== */
-
 export function UsersPage() {
     const [users, setUsers] = useState<ApiUser[]>([]);
     const [searchTerm, setSearchTerm] = useState("");
@@ -103,8 +97,6 @@ export function UsersPage() {
 
     const navigate = useNavigate();
 
-    /* ===================== EFFECTS ===================== */
-
     useEffect(() => {
         fetchUsers();
     }, []);
@@ -114,8 +106,6 @@ export function UsersPage() {
             resetForm();
         }
     }, [isDialogOpen]);
-
-    /* ===================== API ===================== */
 
     const fetchUsers = async () => {
         try {
@@ -153,8 +143,6 @@ export function UsersPage() {
             setIsSubmitting(false);
         }
     };
-
-    /* ===================== HELPERS ===================== */
 
     const updateForm = (key: keyof FormState, value: string) => {
         setForm((prev) => ({ ...prev, [key]: value }));
@@ -201,11 +189,8 @@ export function UsersPage() {
             </Badge>
         );
 
-    /* ===================== RENDER ===================== */
-
     return (
         <div className="space-y-6">
-            {/* HEADER */}
             <div className="flex items-center justify-between">
                 <div>
                     <h1>Пользователи</h1>
@@ -366,7 +351,6 @@ export function UsersPage() {
                 </Dialog>
             </div>
 
-            {/* TABLE */}
             <Card className="shadow-sm">
                 <div className="p-4 border-b border-gray-200">
                     <div className="relative">

@@ -1,6 +1,7 @@
 import { PreviewArea } from "../preview/PreviewArea";
 import { Timeline } from "../preview/Timeline";
 import type { SignageConfig } from "../types";
+import {useEffect} from "react";
 
 interface Props {
     config: SignageConfig;
@@ -9,8 +10,9 @@ interface Props {
     isPlaying: boolean;
     setIsPlaying: React.Dispatch<React.SetStateAction<boolean>>;
     onFullscreen: () => void;
+    onDurationChange: (index: number, duration: number) => void;
+    onReorder: (fromIndex: number, toIndex: number) => void;
 }
-
 export function MainContent({
                                 config,
                                 currentIndex,
@@ -18,10 +20,18 @@ export function MainContent({
                                 isPlaying,
                                 setIsPlaying,
                                 onFullscreen,
+                                onDurationChange,
+                                onReorder
                             }: Props) {
 
+    useEffect(() => {
+        if (config.items.length > 0 && currentIndex >= config.items.length) {
+            setCurrentIndex(0);
+        }
+    }, [config.items.length, currentIndex, setCurrentIndex]);
+
     return (
-        <div className="flex-1 flex flex-col gap-6 overflow-hidden py-6 pr-6">
+        <div className="flex-1 flex flex-col gap-6 overflow-hidden">
             <PreviewArea
                 config={config}
                 currentIndex={currentIndex}
@@ -37,6 +47,8 @@ export function MainContent({
                     currentIndex={currentIndex}
                     setCurrentIndex={setCurrentIndex}
                     setIsPlaying={setIsPlaying}
+                    onDurationChange={onDurationChange}
+                    onReorder={onReorder}
                 />
             )}
         </div>

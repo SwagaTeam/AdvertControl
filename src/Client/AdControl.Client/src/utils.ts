@@ -115,3 +115,11 @@ export const generateRandomPassword = (length = 12): string => {
 
   return password.split('').sort(() => Math.random() - 0.5).join('');
 };
+
+export const isVideo = (name: string) =>
+    ["mp4", "webm", "ogg"].some(ext => name.toLowerCase().endsWith(ext));
+
+export const isImage = (name: string) =>
+    ["jpg", "jpeg", "png", "gif", "webp"].some(ext =>
+        name.toLowerCase().endsWith(ext)
+    );
