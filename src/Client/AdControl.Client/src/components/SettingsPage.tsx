@@ -11,7 +11,7 @@ import {
   SelectValue,
 } from "./ui/select";
 
-export function SettingsPage() {
+export default function SettingsPage() {
   return (
       <div className="space-y-6 max-w-4xl" style={{margin: "auto"}}>
         <div>

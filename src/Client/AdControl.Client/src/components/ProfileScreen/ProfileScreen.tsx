@@ -11,7 +11,7 @@ import { apiClient } from "../../api/apiClient.ts";
 import "./ProfileScreen.css";
 import type {AppDispatch} from "../../store/store.ts";
 
-export const ProfileScreen = () => {
+export default function ProfileScreen() {
     const dispatch = useDispatch<AppDispatch>();
     const { id } = useParams(); // Получаем id из URL параметров
 

@@ -14,7 +14,7 @@ import {formatDateTimeShort, getWordByCount} from "../../utils.ts";
 import {Label} from "../ui/label.tsx";
 import "./screen-detail.css"
 
-export function ScreenDetail() {
+export default function ScreenDetail() {
     const { id } = useParams<{ id: string }>();
     const dispatch = useDispatch<AppDispatch>();
     const [dialogOpen, setDialogOpen] = useState(false);

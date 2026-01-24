@@ -3,9 +3,6 @@ import { Suspense, lazy } from "react";
 import { DashboardPage } from "./components/DashboardPage";
 import { ScreensPage } from "./components/ScreensPage/ScreensPage.tsx";
 import { LoginPage } from "./components/loginPage/LoginPage.tsx";
-import { ProfileScreen } from "./components/ProfileScreen/ProfileScreen.tsx";
-import { ScreenDetail } from "./components/ScreenDetailPage/ScreenDetailPage.tsx";
-import { SettingsPage } from "./components/SettingsPage.tsx";
 import { LandingPage } from "./components/LandingPage/LandingPage.tsx";
 import { UsersPage } from "./components/UsersPage.tsx";
 import { ImageGenerationPage } from "./components/ImageGenerationPage.tsx";
@@ -13,6 +10,10 @@ import { FilePage } from "./components/FilePage.tsx";
 
 const SignageCreatorPage = lazy(() => import('./components/SignageCreatorPage/SignageCreatorPage.tsx'));
 const MainLayout = lazy(() => import("./components/layouts/MainLayout"));
+const ProfileScreen = lazy(() => import("./components/ProfileScreen/ProfileScreen.tsx"));
+const ScreenDetail = lazy(() => import("./components/ScreenDetailPage/ScreenDetailPage.tsx"));
+const SettingsPage = lazy(() => import("./components/SettingsPage.tsx"));
+
 
 const LoadingFallback = () => (
     <div className="flex justify-center items-center h-screen">
@@ -35,12 +36,39 @@ export default function App() {
                         <Route index element={<DashboardPage />} />
                         <Route path="dashboard" element={<DashboardPage />} />
                         <Route path="screens" element={<ScreensPage />} />
-                        <Route path="profile" element={<ProfileScreen />} />
                         <Route path="users" element={<UsersPage />} />
-                        <Route path="user/:id" element={<ProfileScreen />} />
-                        <Route path="settings" element={<SettingsPage />} />
-                        <Route path="screen/:id" element={<ScreenDetail />} />
-
+                        <Route
+                            path="settings"
+                            element={
+                                <Suspense fallback={<LoadingFallback />}>
+                                    <SettingsPage />
+                                </Suspense>
+                            }
+                        />
+                        <Route
+                            path="screen/:id"
+                            element={
+                                <Suspense fallback={<LoadingFallback />}>
+                                    <ScreenDetail />
+                                </Suspense>
+                            }
+                        />
+                        <Route
+                            path="profile"
+                            element={
+                                <Suspense fallback={<LoadingFallback />}>
+                                    <ProfileScreen />
+                                </Suspense>
+                            }
+                        />
+                        <Route
+                            path="user/:id"
+                            element={
+                                <Suspense fallback={<LoadingFallback />}>
+                                    <ProfileScreen />
+                                </Suspense>
+                            }
+                        />
                         <Route
                             path="screen/:id/config"
                             element={
@@ -57,7 +85,6 @@ export default function App() {
                                 </Suspense>
                             }
                         />
-
                         <Route path="ai" element={<ImageGenerationPage />} />
                         <Route path="files" element={<FilePage />} />
                     </Route>
