@@ -167,7 +167,6 @@ export function Timeline({
 
     const handleWheel = (e: React.WheelEvent) => {
         if (e.altKey || e.metaKey) return;
-        e.preventDefault();
         const delta = e.deltaY > 0 ? 0.9 : 1.1;
         setCurrentScale((prev) => Math.max(0.1, Math.min(10, prev * delta)));
     };
@@ -212,13 +211,13 @@ export function Timeline({
                 // Делим на 10, чтобы получить правильное значение
                 newDuration = Math.max(
                     0.5,
-                    Math.round((resizing.startDuration + deltaSeconds) * 10) / 10
+                    Math.round((resizing.startDuration + deltaSeconds) * 1) / 1
                 );
             } else {
                 // Делим на 10 здесь тоже
                 newDuration = Math.max(
                     0.5,
-                    Math.round((resizing.startDuration - deltaSeconds) * 10) / 10
+                    Math.round((resizing.startDuration - deltaSeconds) * 1) / 1
                 );
             }
 

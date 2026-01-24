@@ -1,9 +1,8 @@
-import { Card, CardHeader, CardContent } from "../../ui/card";
-import { Button } from "../../ui/button";
 import {Play, Pause, Square, Upload, Maximize2} from "lucide-react";
-import { PreviewContent } from "./PreviewContent";
-import type { SignageConfig } from "../types";
-import {useEffect} from "react";
+import type {SignageConfig} from "../types";
+import { useEffect } from 'react';
+import './PreviewArea.css';
+import {PreviewContent} from "./PreviewContent.tsx";
 
 interface PreviewAreaProps {
     config: SignageConfig;
@@ -13,6 +12,7 @@ interface PreviewAreaProps {
     setIsPlaying: React.Dispatch<React.SetStateAction<boolean>>;
     onFullScreen: React.Dispatch<React.SetStateAction<boolean>>;
 }
+
 
 export function PreviewArea({
                                 config,
@@ -41,59 +41,64 @@ export function PreviewArea({
         setIsPlaying(false);
     }, [config.items.length]);
 
-
     return (
-        <Card className="flex-1 flex flex-col overflow-hidden">
-            <CardHeader className="bg-gray-50" style={{ padding: "8px", paddingBottom: "0px", marginBottom: "-25px"  }} >
-                <div className="flex items-center justify-between">
-                    <div className="flex items-center justify-between">
-                        <Button variant="outline" onClick={() => onFullScreen(true)} disabled={config.items.length === 0} className="gap-2">
+        <div className="preview-area-card">
+            <div className="preview-area-header">
+                <div className="header-content">
+                    <div className="header-left">
+                        <button
+                            className="fullscreen-button"
+                            onClick={() => onFullScreen(true)}
+                            disabled={config.items.length === 0}
+                        >
                             <Maximize2 className="w-4 h-4" /> На весь экран
-                        </Button>
+                        </button>
                     </div>
                     {config.items.length > 0 && (
-                        <div className="flex items-center gap-3">
-              <span className="text-sm text-gray-600">
-                {currentIndex + 1} / {config.items.length}
-              </span>
-                            <div className="flex gap-1">
-                                <Button variant="outline" size="sm" onClick={() => setIsPlaying(!isPlaying)}>
+                        <div className="header-right">
+                            <span className="counter-text">
+                                {currentIndex + 1} / {config.items.length}
+                            </span>
+                            <div className="controls-group">
+                                <button
+                                    className="control-button"
+                                    onClick={() => setIsPlaying(!isPlaying)}
+                                >
                                     {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
-                                </Button>
-                                <Button
-                                    variant="outline"
-                                    size="sm"
+                                </button>
+                                <button
+                                    className="control-button"
                                     onClick={() => {
                                         setIsPlaying(false);
                                     }}
                                 >
                                     <Square className="w-4 h-4" />
-                                </Button>
+                                </button>
                             </div>
                         </div>
                     )}
                 </div>
-            </CardHeader>
+            </div>
 
-            <CardContent className="flex-1 flex items-center justify-center p-2 bg-gray-100">
+            <div className="preview-content-area">
                 {config.items.length === 0 ? (
-                    <div className="text-center">
-                        <div className="w-32 h-32 mx-auto mb-6 bg-gray-200 rounded-xl flex items-center justify-center">
+                    <div className="empty-state">
+                        <div className="empty-icon">
                             <Upload className="w-16 h-16 text-gray-400" />
                         </div>
-                        <h3 className="text-xl mb-2">Контент не добавлен</h3>
-                        <p className="text-gray-600 mb-6">
+                        <h3 className="empty-title">Контент не добавлен</h3>
+                        <p className="empty-description">
                             Добавьте объекты с боковой панели для предварительного просмотра
                         </p>
                     </div>
                 ) : (
-                    <div style={{overflow: "hidden"}}>
+                    <div className="preview-container">
                         <PreviewContent
                             item={config.items[currentIndex]}
                         />
                     </div>
                 )}
-            </CardContent>
-        </Card>
+            </div>
+        </div>
     );
 }

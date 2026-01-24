@@ -31,7 +31,7 @@ export function MainContent({
     }, [config.items.length, currentIndex, setCurrentIndex]);
 
     return (
-        <div className="flex-1 flex flex-col gap-6 overflow-hidden">
+        <div className="flex-1 flex flex-col gap-6 ">
             <PreviewArea
                 config={config}
                 currentIndex={currentIndex}

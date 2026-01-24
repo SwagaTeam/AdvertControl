@@ -1,0 +1,254 @@
+/* Основные стили контейнера */
+.preview-area-card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+    overflow: hidden;
+    border-radius: .625rem;
+    border: 1px solid #e3e5e9;
+    background-color: white;
+}
+
+/* Шапка */
+.preview-area-header {
+    background-color: #f9fafb;
+    padding: 8px;
+    padding-bottom: 0;
+    margin-bottom: -25px;
+    flex-shrink: 0;
+    height: 8vh;
+}
+
+.header-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.header-left, .header-right {
+    display: flex;
+    align-items: center;
+}
+
+/* Кнопка на весь экран */
+.fullscreen-button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    background-color: white;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s;
+}
+
+.fullscreen-button:hover:not(:disabled) {
+    background-color: #f3f4f6;
+}
+
+.fullscreen-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.button-icon {
+    font-size: 16px;
+}
+
+/* Счетчик и контролы */
+.counter-text {
+    font-size: 14px;
+    color: #4b5563;
+    margin-right: 12px;
+}
+
+.controls-group {
+    display: flex;
+    gap: 4px;
+}
+
+.control-button {
+    padding: 6px;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    background-color: white;
+    cursor: pointer;
+    font-size: 14px;
+    min-width: 32px;
+    transition: all 0.2s;
+}
+
+.control-button:hover {
+    background-color: #f3f4f6;
+}
+
+/* Область контента */
+.preview-content-area {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px;
+    background-color: #eff0f2;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.preview-container {
+    width: 100%;
+    height: 100%;
+    max-height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+/* Состояние пустого контента */
+.empty-state {
+    text-align: center;
+}
+
+.empty-icon {
+    width: 128px;
+    height: 128px;
+    margin: 0 auto 24px;
+    background-color: #e5e7eb;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.upload-icon {
+    font-size: 64px;
+    color: #9ca3af;
+}
+
+.empty-title {
+    font-size: 20px;
+    margin-bottom: 8px;
+    color: #111827;
+}
+
+.empty-description {
+    color: #6b7280;
+    margin-bottom: 24px;
+}
+
+/* Обертка контента */
+.preview-content-wrapper {
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #ffffff;
+    overflow: hidden;
+}
+
+/* Контейнеры для медиа */
+.image-container,
+.video-container {
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background-color: #eff0f2;
+}
+
+/* Изображение */
+.preview-image {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    display: block;
+}
+
+/* Видео */
+.preview-video {
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    display: block;
+}
+
+/* Плейсхолдеры */
+.placeholder-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.placeholder-icon {
+    font-size: 128px;
+    opacity: 0.5;
+    margin-bottom: 16px;
+}
+
+.placeholder-text {
+    font-size: 18px;
+    color: #6b7280;
+}
+
+.video-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: #000000;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.video-placeholder-icon {
+    font-size: 128px;
+    opacity: 0.5;
+    margin-bottom: 16px;
+}
+
+.video-placeholder-text {
+    font-size: 18px;
+    color: rgba(255, 255, 255, 0.7);
+    margin-left: 16px;
+}
+
+/* Скрытый класс */
+.hidden {
+    display: none !important;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .preview-area-header {
+        padding: 6px;
+    }
+
+    .fullscreen-button {
+        padding: 4px 8px;
+        font-size: 13px;
+    }
+
+    .counter-text {
+        font-size: 13px;
+    }
+
+    .control-button {
+        padding: 4px;
+        min-width: 28px;
+    }
+}

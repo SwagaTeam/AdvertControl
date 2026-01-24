@@ -1,5 +1,5 @@
 import {useEffect, useState} from "react";
-import {Pause, Play, X} from "lucide-react";
+import {X} from "lucide-react";
 import {Button} from "../../ui/button.tsx";
 import type {ContentItem} from "../types.ts";
 import {PreviewContent} from "./PreviewContent.tsx";
@@ -39,22 +39,13 @@ export function FullscreenPreview({
         <div className="fixed inset-0 bg-black z-50">
             <button
                 onClick={onClose}
-                className="absolute top-6 right-6 z-10 bg-white/10 hover:bg-white/20 text-white p-3 rounded-full backdrop-blur-sm transition-colors"
+                style={{right: "6px", color: "gray"}}
+                className="absolute top-6 z-10 bg-white/10 hover:bg-white/20 text-white p-3 rounded-full backdrop-blur-sm transition-colors"
             >
                 <X className="w-6 h-6" />
             </button>
 
-            <div className="absolute bottom-6 left-6 z-10 flex gap-2">
-                <Button
-                    variant="outline"
-                    className="bg-white/10 hover:bg-white/20 text-white border-white/20"
-                    onClick={() => setIsPlaying(!isPlaying)}
-                >
-                    {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
-                </Button>
-            </div>
-
-            <div className="absolute bottom-6 right-6 z-10 text-white bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full">
+            <div style={{color: "gray"}} className="absolute bottom-6 right-6 z-10 text-white bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full">
                 {currentIndex + 1} / {items.length}
             </div>
 

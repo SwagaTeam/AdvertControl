@@ -51,6 +51,22 @@ export function LeftSidebar({
         })),
     });
 
+    const updateConfigPayload = () => ({
+        dto: {
+            name: config.name,
+            screensCount: config.screensCount,
+            items: config.items.map((item, index) => ({
+                durationSeconds: Number(item.durationSeconds) || 0,
+                order: index + 1,
+                type: item.type,
+                url: item.url,
+                inlineData: item.inlineData ?? "",
+                checksum: item.checksum ?? "",
+                size: item.size ?? 0,
+            }))
+        }
+    });
+
     /* ================= API ================= */
 
     const createConfig = async (): Promise<string> => {
@@ -63,9 +79,9 @@ export function LeftSidebar({
             throw new Error("Отсутствует id конфига");
         }
 
-        await apiClient.patch(
-            `/config/${config.id}/update`,
-            buildConfigPayload()
+        await apiClient.post(
+            `/config/${config.id}/update-config`,
+            updateConfigPayload()
         );
     };
 
