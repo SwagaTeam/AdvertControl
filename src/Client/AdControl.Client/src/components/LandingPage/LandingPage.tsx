@@ -160,25 +160,14 @@ export const LandingPage = () => {
               </motion.div>
             </motion.div>
 
-              <motion.div
-                  animate={{
-                      y: [0, -40, 0], // Оставляем анимацию левитации контейнера
-                  }}
-                  transition={{
-                      duration: 6,
-                      repeat: Infinity,
-                      ease: "easeInOut"
-                  }}
-                  className="relative hide-on-mobile flex justify-center items-center"
-              >
-                  {/* Вставляем 3D компонент */}
+              <div className="relative hide-on-mobile flex justify-center items-center">
                   <Suspense fallback={<div></div>}>
                       <LazyViewer3D
-                          url="/billboard12.glb" // ПУТЬ К ВАШЕМУ ФАЙЛУ (относительно папки public)
-                          className="mx-auto"  // Доп. классы Tailwind если нужно
+                          url="/billboard12.glb"
+                          className="mx-auto"
                       />
                   </Suspense>
-              </motion.div>
+              </div>
           </div>
         </div>
       </section>

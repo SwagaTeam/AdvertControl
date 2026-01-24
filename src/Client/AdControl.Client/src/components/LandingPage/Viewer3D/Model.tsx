@@ -11,9 +11,16 @@ export const Model: React.FC<ModelProps> = ({ url }) => {
     const { scene } = useGLTF(url);
     const groupRef = useRef<THREE.Group>(null);
 
-    useFrame((state, delta) => {
+    useFrame((state) => {
         if (groupRef.current) {
-            groupRef.current.rotation.y += delta * 0.8;
+            const time = state.clock.elapsedTime;
+
+            // Медленное плавное вращение
+            const smoothRotation = Math.sin(time) * 0.5 - 1;
+
+            // Плавное движение с lerp
+            groupRef.current.rotation.y =
+                groupRef.current.rotation.y * 0.25 + smoothRotation * 0.75;
         }
     });
 
