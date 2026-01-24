@@ -5,7 +5,6 @@ import {
 } from 'lucide-react';
 import { Button } from './Button';
 import { StepCard } from './StepCard';
-import { ImageWithFallback } from './ImageWithFallback';
 import "./index.css"
 import { useNavigate } from 'react-router-dom';
 import { Header } from '../layouts/Header';
@@ -16,7 +15,9 @@ import {
     FaWindows,
     FaAndroid,
 } from 'react-icons/fa';
+import { lazy, Suspense } from 'react';
 
+const LazyViewer3D = lazy(() => import('./Viewer3D/Viewer3D'));
 
 export const LandingPage = () => {
     const navigate = useNavigate();
@@ -159,24 +160,25 @@ export const LandingPage = () => {
               </motion.div>
             </motion.div>
 
-            <motion.div
-            animate={{
-                y: [0, -40, 0],
-            }}
-            transition={{
-                duration: 6,
-                repeat: Infinity,
-                ease: "easeInOut"
-            }}
-            className="relative hide-on-mobile"
-            >
-            <ImageWithFallback
-                src="./ad-screen.png"
-                alt="Dashboard Interface"
-                className="w-full h-full"
-                style={{paddingLeft: "2rem"}}
-            />
-            </motion.div>
+              <motion.div
+                  animate={{
+                      y: [0, -40, 0], // Оставляем анимацию левитации контейнера
+                  }}
+                  transition={{
+                      duration: 6,
+                      repeat: Infinity,
+                      ease: "easeInOut"
+                  }}
+                  className="relative hide-on-mobile flex justify-center items-center"
+              >
+                  {/* Вставляем 3D компонент */}
+                  <Suspense fallback={<div></div>}>
+                      <LazyViewer3D
+                          url="/billboard12.glb" // ПУТЬ К ВАШЕМУ ФАЙЛУ (относительно папки public)
+                          className="mx-auto"  // Доп. классы Tailwind если нужно
+                      />
+                  </Suspense>
+              </motion.div>
           </div>
         </div>
       </section>
