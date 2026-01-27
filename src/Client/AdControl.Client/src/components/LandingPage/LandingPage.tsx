@@ -163,7 +163,7 @@ export const LandingPage = () => {
               <div className="relative hide-on-mobile flex justify-center items-center">
                   <Suspense fallback={<div></div>}>
                       <LazyViewer3D
-                          url="/billboard12.glb"
+                          url="/Billboard V7.glb"
                           className="mx-auto"
                       />
                   </Suspense>

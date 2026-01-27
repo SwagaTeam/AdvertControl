@@ -1,6 +1,6 @@
-import React, { useRef } from 'react';
+import React, {useEffect, useRef} from 'react';
 import { useFrame } from '@react-three/fiber';
-import { useGLTF, Center } from '@react-three/drei';
+import { useGLTF, Center, useAnimations } from '@react-three/drei';
 import * as THREE from 'three';
 
 interface ModelProps {
@@ -8,26 +8,29 @@ interface ModelProps {
 }
 
 export const Model: React.FC<ModelProps> = ({ url }) => {
-    const { scene } = useGLTF(url);
+    const { scene, animations } = useGLTF(url);
     const groupRef = useRef<THREE.Group>(null);
+    const { actions, names } = useAnimations(animations, groupRef);
+
+    useEffect(() => {
+        actions[names[0]]?.reset().play();
+    }, [actions, names]);
 
     useFrame((state) => {
         if (groupRef.current) {
             const time = state.clock.elapsedTime;
 
-            // Медленное плавное вращение
-            const smoothRotation = Math.sin(time) * 0.5 - 1;
+            const smoothRotation = Math.sin(time) * 0.4 - 1.57;
 
-            // Плавное движение с lerp
             groupRef.current.rotation.y =
-                groupRef.current.rotation.y * 0.25 + smoothRotation * 0.75;
+                THREE.MathUtils.lerp(groupRef.current.rotation.y, smoothRotation, 0.1);
         }
     });
 
     return (
-        <group ref={groupRef}>
+        <group ref={groupRef} dispose={null}>
             <Center>
-                <primitive object={scene} />
+                <primitive object={scene} position={[0, -0.37, 0]}/>
             </Center>
         </group>
     );

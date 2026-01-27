@@ -1,6 +1,6 @@
 import { Suspense } from 'react';
 import { Canvas } from '@react-three/fiber';
-import { Environment, ContactShadows, PresentationControls } from '@react-three/drei';
+import { Environment, PresentationControls } from '@react-three/drei';
 import { Model } from './Model';
 
 interface Viewer3DProps {
@@ -10,10 +10,10 @@ interface Viewer3DProps {
 
 export default function Viewer3D({ url, className } : Viewer3DProps)  {
     return (
-        <div className={className} style={{ width: '1200px', height: '700px', position: 'relative', marginTop: "70px"  }}>
+        <div className={className} style={{ width: '1200px', height: '700px', position: 'relative', marginLeft: '-60px'  }}>
             <Canvas
                 shadows
-                camera={{ position: [0, 0, 20], fov: 45 }}
+                camera={{ position: [0, 0, 2.45], fov: 45 }}
                 gl={{ antialias: true, alpha: true }}
             >
                 <ambientLight intensity={0.7} />
@@ -28,6 +28,7 @@ export default function Viewer3D({ url, className } : Viewer3DProps)  {
                         zoom={1}
                         polar={[0, 0]}
                         azimuth={[-Infinity, Infinity]}
+
                     >
                         <Model url={url} />
                     </PresentationControls>
