@@ -24,12 +24,12 @@ export const LoginPage: React.FC = () => {
 
         if (resultAction.meta.requestStatus === "fulfilled") {
             setIsSuccess(true);
-            setTimeout(() => navigate("/crm"), 1000);
+            setTimeout(() => navigate("/crm/dashboard"), 1000);
         }
     };
 
     useEffect(() => {
-        if(localStorage.getItem("token") !== null) navigate("/crm")
+        if(localStorage.getItem("token") !== null) navigate("/crm/dashboard");
     })
 
     return (
